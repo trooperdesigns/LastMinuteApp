@@ -126,7 +126,7 @@ public class MainActivity extends FragmentActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.setCurrentItem(1);
+        mViewPager.setCurrentItem(0);
 
         logout = (Button) findViewById(R.id.logout_button);
         message = (TextView) findViewById(R.id.message);
@@ -180,15 +180,10 @@ public class MainActivity extends FragmentActivity {
 
             switch (position) {
                 case 0:
-                    // Event fragment
-                    Log.d("fragment", "2nd fragment");
-                    return new NewEventFragment();
-                case 1:
                     // Events Fragment
                     Log.d("fragment", "event Fragment");
                     return new EventsFragment();
-
-                case 2:
+                case 1:
                     // Create new event fragment
                     Log.d("fragment", "left fragment");
                     return new NewEventFragment();
@@ -199,7 +194,7 @@ public class MainActivity extends FragmentActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 2;
         }
 
         @Override
@@ -207,11 +202,9 @@ public class MainActivity extends FragmentActivity {
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return getString(R.string.title_section1).toUpperCase(l);
+                    return getString(R.string.title_events).toUpperCase(l);
                 case 1:
-                    return getString(R.string.title_section2).toUpperCase(l);
-                case 2:
-                    return getString(R.string.title_section3).toUpperCase(l);
+                    return getString(R.string.title_create).toUpperCase(l);
             }
             return null;
         }
