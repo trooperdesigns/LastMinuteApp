@@ -2,7 +2,9 @@ package trooperdesigns.com.lastminute;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ListFragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -29,8 +31,7 @@ public class EventsFragment extends ListFragment {
 
 	private CustomAdapter eventsAdapter;
 	private ListView listView;
-	private Button refresh;
-	private EditText eventSearch;
+	private SwipeRefreshLayout swipeLayout;
 
 	public EventsFragment() {
 	}
@@ -43,18 +44,17 @@ public class EventsFragment extends ListFragment {
 				false);
 
 		listView = (ListView) rootView.findViewById(android.R.id.list);
-		refresh = (Button) rootView.findViewById(R.id.refresh);
-		eventSearch = (EditText) rootView.findViewById(R.id.event_search);
-		
-		// refresh button to refresh the contents of events TODO: i.e. pull down to refresh
-		refresh.setOnClickListener(new View.OnClickListener() {
+
+		swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
+		swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
-			public void onClick(View v) {
+			public void onRefresh() {
 				load();
 				eventsAdapter.loadObjects();
+				swipeLayout.setRefreshing(false);
 			}
 		});
-		
+
 		// setting custom adapter for listFragment
 		eventsAdapter = new CustomAdapter(getActivity());
 		listView.setAdapter(eventsAdapter);
@@ -64,19 +64,7 @@ public class EventsFragment extends ListFragment {
 		eventsAdapter.loadObjects();
 		setNumEvents();
 		getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-		eventSearch.addTextChangedListener(new TextWatcher(){
-		    @Override
-		    public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-		        // When user changed the Text
-		        eventsAdapter.getFilter().filter(cs);
-		    }
 
-		    @Override
-		    public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) { }
-
-		    @Override
-		    public void afterTextChanged(Editable arg0) {}
-		});
 		return rootView;
 	}
 	

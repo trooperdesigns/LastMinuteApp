@@ -145,7 +145,7 @@ public class LoginActivity extends Activity {
 	public static void showHashKey(Context context) {
 		try {
 			PackageInfo info = context.getPackageManager().getPackageInfo(
-					"com.trooperdesigns.lastminute", PackageManager.GET_SIGNATURES); // Your
+					"trooperdesigns.com.lastminute", PackageManager.GET_SIGNATURES); // Your
 																						// package
 																						// name
 																						// here

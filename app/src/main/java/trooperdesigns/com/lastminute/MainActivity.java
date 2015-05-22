@@ -4,12 +4,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -60,8 +62,6 @@ public class MainActivity extends FragmentActivity {
     private TextView userNameView, userGenderView, userEmailView;
     private Dialog progressDialog;
     private Button logout;
-    private EditText searchFriend;
-    private Button searchFriendButton;
     private GridView gridView;
 
     private Integer[] mThumbIds = {
@@ -118,7 +118,38 @@ public class MainActivity extends FragmentActivity {
 
         logout = (Button) findViewById(R.id.logout_button);
         message = (TextView) findViewById(R.id.message);
+
         settingsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        settingsPanel.setAnchorPoint(0.5f);
+
+
+
+        settingsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View view, float v) {
+
+
+            }
+
+            @Override
+            public void onPanelCollapsed(View view) {
+
+            }
+
+            @Override
+            public void onPanelExpanded(View view) {
+                mViewPager.getAdapter();
+            }
+
+            @Override
+            public void onPanelAnchored(View view) {
+            }
+
+            @Override
+            public void onPanelHidden(View view) {
+
+            }
+        });
 
         gridView = (GridView) findViewById(R.id.gridview);
         gridView.setAdapter(new GridAdapter(this));
@@ -146,7 +177,7 @@ public class MainActivity extends FragmentActivity {
 
                 switch(position){
                     case 0:
-                        Intent i = new Intent(MainActivity.this, EventDetailsActivity.class);
+                        Intent i = new Intent(MainActivity.this, SettingsActivity.class);
                         startActivity(i);
                         break;
                     case 1:
@@ -180,11 +211,13 @@ public class MainActivity extends FragmentActivity {
     @Override
     public void onBackPressed() {
         // if sliding panel is open, close it
-        if(settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED){
+        if(settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED ||
+                settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED)
+        {
             settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
-            // otherwise close the app
-            finish();
+            // otherwise do as it normally would (finish())
+            super.onBackPressed();
         }
 
         return;
@@ -211,13 +244,7 @@ public class MainActivity extends FragmentActivity {
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
-            // Return a DummySectionFragment (defined as a static inner class
-            // below) with the page number as its lone argument.
-            // Fragment fragment = new EventFragment();
-            // Bundle args = new Bundle();
-            // args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position +
-            // 1);
-            // fragment.setArguments(args);
+            // return the selected page
 
             switch (position) {
                 case 0:
@@ -282,7 +309,7 @@ public class MainActivity extends FragmentActivity {
             if(convertView == null){
                 grid = new View(mContext);
                 LayoutInflater inflater = getLayoutInflater();
-                grid=inflater.inflate(R.layout.settings_grid, parent, false);
+                grid = inflater.inflate(R.layout.settings_grid, parent, false);
             }else{
                 grid = (View)convertView;
             }
