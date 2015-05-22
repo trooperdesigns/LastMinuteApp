@@ -48,6 +48,11 @@ public class LoginActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 
+		message = (TextView) findViewById(R.id.message);
+		usernameInput = (EditText) findViewById(R.id.username);
+		passwordInput = (EditText) findViewById(R.id.password);
+		loginButton = (Button) findViewById(R.id.login_button);
+
 		usernameInput.setText("justin");
 		passwordInput.setText("password");
 
@@ -79,10 +84,7 @@ public class LoginActivity extends Activity {
 
 		}
 
-		message = (TextView) findViewById(R.id.message);
-		usernameInput = (EditText) findViewById(R.id.username);
-		passwordInput = (EditText) findViewById(R.id.password);
-		loginButton = (Button) findViewById(R.id.login_button);
+
 
 		showHashKey(this);
 
