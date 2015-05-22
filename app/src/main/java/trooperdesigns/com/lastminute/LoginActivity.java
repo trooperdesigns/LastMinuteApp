@@ -2,7 +2,6 @@ package trooperdesigns.com.lastminute;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -11,24 +10,25 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.LogInCallback;
-import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseAnonymousUtils;
 import com.parse.ParseException;
-import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 
 public class LoginActivity extends Activity {
@@ -42,15 +42,11 @@ public class LoginActivity extends Activity {
 	private String username;
 	private String password;
 
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
-
-		message = (TextView) findViewById(R.id.message);
-		usernameInput = (EditText) findViewById(R.id.username);
-		passwordInput = (EditText) findViewById(R.id.password);
-		loginButton = (Button) findViewById(R.id.login_button);
 
 		usernameInput.setText("justin");
 		passwordInput.setText("password");
@@ -82,6 +78,11 @@ public class LoginActivity extends Activity {
 			}
 
 		}
+
+		message = (TextView) findViewById(R.id.message);
+		usernameInput = (EditText) findViewById(R.id.username);
+		passwordInput = (EditText) findViewById(R.id.password);
+		loginButton = (Button) findViewById(R.id.login_button);
 
 		showHashKey(this);
 
@@ -163,4 +164,6 @@ public class LoginActivity extends Activity {
 		// Logs 'app deactivate' App Event.
 		//AppEventsLogger.deactivateApp(this);
 	}
+
+
 }

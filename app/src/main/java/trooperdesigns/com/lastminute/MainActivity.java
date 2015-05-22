@@ -1,12 +1,8 @@
 package trooperdesigns.com.lastminute;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.FragmentTransaction;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -14,32 +10,28 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
-import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.FunctionCallback;
 import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseAnonymousUtils;
-import com.parse.ParseCloud;
-import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 
 
@@ -70,18 +62,14 @@ public class MainActivity extends FragmentActivity {
     private Button logout;
     private EditText searchFriend;
     private Button searchFriendButton;
+    private GridView gridView;
 
-    private static final List<String> PERMISSIONS = new ArrayList<String>() {
-        {
-            add("user_friends");
-            add("public_profile");
-        }
+    private Integer[] mThumbIds = {
+            R.drawable.settings_icon,
+            R.drawable.settings_icon,
+            R.drawable.settings_icon,
+            R.drawable.settings_icon
     };
-    private static final int PICK_FRIENDS_ACTIVITY = 1;
-    private TextView resultsTextView;
-
-    private ParseUser foundUser;
-    private String alertText = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,23 +120,76 @@ public class MainActivity extends FragmentActivity {
         message = (TextView) findViewById(R.id.message);
         settingsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
 
+        gridView = (GridView) findViewById(R.id.gridview);
+        gridView.setAdapter(new GridAdapter(this));
+        gridView.setNumColumns(4);
+
+        // disable gridView scrolling so it doesn't get in the way
+        gridView.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                    return true;
+                }
+                return false;
+            }
+
+        });
+
+        // gridView item click listener
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+                switch(position){
+                    case 0:
+                        Intent i = new Intent(MainActivity.this, EventDetailsActivity.class);
+                        startActivity(i);
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        break;
+                }
+            }
+        });
+
         logout.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-            // TODO Auto-generated method stub
-            ParseUser.logOut();
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                    | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-            Toast.makeText(MainActivity.this, "Logout successful!",
-                    Toast.LENGTH_SHORT).show();
-        }
-    });
+                // TODO Auto-generated method stub
+                ParseUser.logOut();
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+                Toast.makeText(MainActivity.this, "Logout successful!",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
+
+    @Override
+    public void onBackPressed() {
+        // if sliding panel is open, close it
+        if(settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED){
+            settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        } else {
+            // otherwise close the app
+            finish();
+        }
+
+        return;
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -207,6 +248,49 @@ public class MainActivity extends FragmentActivity {
                     return getString(R.string.title_create).toUpperCase(l);
             }
             return null;
+        }
+    }
+
+    public class GridAdapter extends BaseAdapter {
+
+        private Context mContext;
+
+        public GridAdapter(Context c) {
+            mContext = c;
+        }
+
+        @Override
+        public int getCount() {
+            return mThumbIds.length;
+        }
+
+        @Override
+        public Object getItem(int arg0) {
+            return mThumbIds[arg0];
+        }
+
+        @Override
+        public long getItemId(int arg0) {
+            return arg0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            View grid;
+
+            if(convertView == null){
+                grid = new View(mContext);
+                LayoutInflater inflater = getLayoutInflater();
+                grid=inflater.inflate(R.layout.settings_grid, parent, false);
+            }else{
+                grid = (View)convertView;
+            }
+
+            ImageView imageView = (ImageView)grid.findViewById(R.id.image);
+            imageView.setImageResource(mThumbIds[position]);
+
+            return grid;
         }
     }
 
