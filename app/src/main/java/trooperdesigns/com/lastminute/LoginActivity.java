@@ -84,8 +84,6 @@ public class LoginActivity extends Activity {
 
 		}
 
-
-
 		showHashKey(this);
 
 		// local login click

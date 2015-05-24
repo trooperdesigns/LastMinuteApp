@@ -3,12 +3,14 @@ package trooperdesigns.com.lastminute;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -18,12 +20,16 @@ import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,8 +42,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.Locale;
 
-
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements FragmentChangeListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -56,13 +61,18 @@ public class MainActivity extends FragmentActivity {
 
     private TextView message;
     private PagerTitleStrip titleStrip;
-    private SlidingUpPanelLayout settingsPanel;
+    public static SlidingUpPanelLayout settingsPanel;
     private int numEvents;
     private ParseUser currentUser;
     private TextView userNameView, userGenderView, userEmailView;
     private Dialog progressDialog;
     private Button logout;
     private GridView gridView;
+    private ImageView slideIcon;
+    private LinearLayout sliderHelper;
+
+    private EventsFragment eventsFragment;
+    private NewEventFragment newEventFragment;
 
     private Integer[] mThumbIds = {
             R.drawable.settings_icon,
@@ -118,31 +128,46 @@ public class MainActivity extends FragmentActivity {
 
         logout = (Button) findViewById(R.id.logout_button);
         message = (TextView) findViewById(R.id.message);
+        sliderHelper = (LinearLayout) findViewById(R.id.slider_helper);
 
         settingsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
         settingsPanel.setAnchorPoint(0.5f);
 
+        slideIcon = (ImageView) findViewById(R.id.settings_icon);
 
 
         settingsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
-            public void onPanelSlide(View view, float v) {
+            public void onPanelSlide(View view, float slideOffset) {
+                if(settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
 
-
+                }
             }
 
             @Override
             public void onPanelCollapsed(View view) {
+                slideIcon.setRotation(0f);
 
             }
 
             @Override
             public void onPanelExpanded(View view) {
-                mViewPager.getAdapter();
+                slideIcon.setRotation(180f);
+
+                sliderHelper.setOnTouchListener(new View.OnTouchListener(){
+
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        MainActivity.settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);MainActivity.settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                        return false;
+                    }
+                });
+
             }
 
             @Override
             public void onPanelAnchored(View view) {
+                slideIcon.setRotation(180f);
             }
 
             @Override
@@ -169,13 +194,13 @@ public class MainActivity extends FragmentActivity {
         });
 
         // gridView item click listener
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
 
-                switch(position){
+                switch (position) {
                     case 0:
                         Intent i = new Intent(MainActivity.this, SettingsActivity.class);
                         startActivity(i);
@@ -208,12 +233,21 @@ public class MainActivity extends FragmentActivity {
 
     }
 
+    public void showOtherFragment() {
+        Fragment fr = new NewEventFragment();
+        FragmentChangeListener fc = (FragmentChangeListener) this;
+        fc.replaceFragment(fr);
+    }
+
+    public SlidingUpPanelLayout getSlidingPanel(){
+        return this.settingsPanel;
+    }
+
     @Override
     public void onBackPressed() {
         // if sliding panel is open, close it
-        if(settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED ||
-                settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED)
-        {
+        if (settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED ||
+                settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED) {
             settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
             // otherwise do as it normally would (finish())
@@ -221,6 +255,15 @@ public class MainActivity extends FragmentActivity {
         }
 
         return;
+    }
+
+    @Override
+    public void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(mViewPager.getId(), fragment, fragment.toString());
+        fragmentTransaction.addToBackStack(fragment.toString());
+        fragmentTransaction.commit();
     }
 
 
@@ -250,11 +293,13 @@ public class MainActivity extends FragmentActivity {
                 case 0:
                     // Events Fragment
                     Log.d("fragment", "event Fragment");
-                    return new EventsFragment();
+                    eventsFragment = new EventsFragment();
+                    return eventsFragment;
                 case 1:
                     // Create new event fragment
                     Log.d("fragment", "left fragment");
-                    return new NewEventFragment();
+                    newEventFragment = new NewEventFragment();
+                    return newEventFragment;
             }
             return null;
         }
@@ -306,15 +351,15 @@ public class MainActivity extends FragmentActivity {
 
             View grid;
 
-            if(convertView == null){
+            if (convertView == null) {
                 grid = new View(mContext);
                 LayoutInflater inflater = getLayoutInflater();
                 grid = inflater.inflate(R.layout.settings_grid, parent, false);
-            }else{
-                grid = (View)convertView;
+            } else {
+                grid = (View) convertView;
             }
 
-            ImageView imageView = (ImageView)grid.findViewById(R.id.image);
+            ImageView imageView = (ImageView) grid.findViewById(R.id.image);
             imageView.setImageResource(mThumbIds[position]);
 
             return grid;

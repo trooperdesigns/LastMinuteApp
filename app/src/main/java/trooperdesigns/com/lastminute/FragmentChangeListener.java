@@ -1,0 +1,8 @@
+package trooperdesigns.com.lastminute;
+
+import android.support.v4.app.Fragment;
+
+public interface FragmentChangeListener
+{
+    public void replaceFragment(Fragment fragment);
+}

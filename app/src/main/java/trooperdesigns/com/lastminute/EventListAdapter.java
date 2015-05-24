@@ -7,24 +7,29 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.ParseFile;
 import com.parse.ParseImageView;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 
-public class CustomAdapter extends ParseQueryAdapter implements Filterable {
+public class EventListAdapter extends ParseQueryAdapter implements Filterable {
+
 	@SuppressWarnings("unchecked")
-	public CustomAdapter(Context context) {
+	public EventListAdapter(Context context) {
 		
 		// Use the QueryFactory to construct a PQA that will only show
 		// Todos marked as high-pri
 		super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
 			public ParseQuery<ParseObject> create() {
 				ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Todo");
+				// First try to find from the cache and only then go to network
+				query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE); // or CACHE_ONLY
 				//query.whereEqualTo("highPri", true);
 				return query;
 			}
@@ -100,6 +105,22 @@ public class CustomAdapter extends ParseQueryAdapter implements Filterable {
         };
 
         return filter;
+	}
+
+	@Override
+	public boolean isEnabled(int position) {
+
+		// if panel isn't closed (i.e. expanded, anchored, or draggin), close panel if clicking outside
+		if(MainActivity.settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED
+				|| MainActivity.settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED
+				|| MainActivity.settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.DRAGGING){
+			//Toast.makeText(super.getContext(), MainActivity.settingsPanel.getPanelState().toString(), Toast.LENGTH_SHORT).show();
+			//MainActivity.settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);MainActivity.settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+			return false;
+		}
+
+		super.isEnabled(position);
+		return true;
 	}
 
 }

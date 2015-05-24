@@ -2,11 +2,9 @@ package trooperdesigns.com.lastminute;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ListFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +13,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 
 public class EventsFragment extends ListFragment {
@@ -29,7 +27,7 @@ public class EventsFragment extends ListFragment {
 	public static final String ARG_SECTION_NUMBER = "section_number";
 	public static int numEvents;
 
-	private CustomAdapter eventsAdapter;
+	private EventListAdapter eventsAdapter;
 	private ListView listView;
 	private SwipeRefreshLayout swipeLayout;
 
@@ -56,7 +54,7 @@ public class EventsFragment extends ListFragment {
 		});
 
 		// setting custom adapter for listFragment
-		eventsAdapter = new CustomAdapter(getActivity());
+		eventsAdapter = new EventListAdapter(getActivity());
 		listView.setAdapter(eventsAdapter);
 		
 		// initial load of events list contents
@@ -114,13 +112,27 @@ public class EventsFragment extends ListFragment {
 		}
 		*/
 		Intent i = new Intent(getActivity(), EventDetailsActivity.class);
+
+
+		// put all event information necessary for full event page in bundle
+		Bundle bundle = new Bundle();
+		bundle.putString("objectId", object.getObjectId()); // objectId of event
+		bundle.putString("title", object.getString("title")); // title of event
+		bundle.putString("createdAt", object.getCreatedAt().toString()); // createdAt
+
+		ParseFile pf = object.getParseFile("image");
+		if(pf != null){
+			bundle.putString("image", object.getParseFile("image").getUrl()); // put parse image file in bundle
+		}
+
+		i.putExtras(bundle);
+
 		startActivity(i);
 		update();
 		
 
 		// do something
-		Toast.makeText(getActivity(), object.getString("title"),
-				Toast.LENGTH_SHORT).show();
+		//Toast.makeText(getActivity(), object.getString("title"), Toast.LENGTH_SHORT).show();
 	}
 	
 	

@@ -5,178 +5,194 @@
     android:orientation="vertical"
     android:padding="0dp" >
 
-    <com.sothree.slidinguppanel.SlidingUpPanelLayout
-        xmlns:sothree="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/sliding_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="bottom"
-        sothree:umanoParalaxOffset="50dp"
-        sothree:umanoPanelHeight="40dp"
-        sothree:umanoShadowHeight="4dp" >
-
-        <android.support.v4.view.ViewPager
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/pager"
+        <com.sothree.slidinguppanel.SlidingUpPanelLayout
+            xmlns:sothree="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/sliding_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:context=".MainActivity"
-            >
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            sothree:umanoParalaxOffset="50dp"
+            sothree:umanoPanelHeight="40dp"
+            sothree:umanoShadowHeight="4dp" >
 
-            <android.support.v4.view.PagerTitleStrip
-                android:id="@+id/pager_title_strip"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:background="#33b5e5"
-                android:paddingBottom="15dp"
+            <!-- bottom layer, actual design/layout -->
+            <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
 
-                android:paddingTop="15dp"
-                android:textColor="#fff" />
+                <android.support.v4.view.ViewPager
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:id="@+id/pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:context=".MainActivity">
 
-        </android.support.v4.view.ViewPager>
+                    <android.support.v4.view.PagerTitleStrip
+                        android:id="@+id/pager_title_strip"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top"
+                        android:background="#33b5e5"
+                        android:paddingBottom="15dp"
 
-        <!-- This is the settings pull up drawer -->
+                        android:paddingTop="15dp"
+                        android:textColor="#fff" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
+                </android.support.v4.view.ViewPager>
 
-            <ImageView
-                android:id="@+id/settings_icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:src="@drawable/settings_icon"/>
+                // layer above sliding up panel used for touch listener to close sliding panel when open
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical"
+                    android:padding="0dp"
+                    android:id="@+id/slider_helper">
+                </LinearLayout>
+
+            </FrameLayout>
+
+            <!-- This is the settings pull up drawer -->
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent"
-                android:background="#D0D0D0"
+                android:layout_height="wrap_content"
                 android:orientation="vertical" >
 
-
+                <ImageView
+                    android:id="@+id/settings_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:src="@drawable/up_arrow"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="10dp" >
+                    android:layout_height="fill_parent"
+                    android:background="#D0D0D0"
+                    android:orientation="vertical" >
 
 
-                    <TextView
-                        android:id="@+id/message"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center|top"
-                        android:text="Settings Panel"
-                        android:textSize="16sp" />
-
-                    <GridView
-                        android:id="@+id/gridview"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:numColumns="auto_fit"
-                        android:verticalSpacing="10dp"
-                        android:horizontalSpacing="5dp"
-                        android:stretchMode="columnWidth"
-                        android:gravity="center"
-                        android:scrollbars="none" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:gravity="left"
-                        android:orientation="horizontal" >
-
-                        <!-- friend search bar -->
-
-
-                        <!-- profile info starts here -->
+                        android:orientation="vertical"
+                        android:padding="10dp" >
 
 
                         <TextView
-                            android:id="@+id/userName"
-                            android:layout_width="wrap_content"
+                            android:id="@+id/message"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:textColor="#333"
-                            android:textSize="18sp" />
+                            android:gravity="center|top"
+                            android:text="Settings Panel"
+                            android:textSize="16sp" />
+
+                        <GridView
+                            android:id="@+id/gridview"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:numColumns="auto_fit"
+                            android:verticalSpacing="10dp"
+                            android:horizontalSpacing="5dp"
+                            android:stretchMode="columnWidth"
+                            android:gravity="center"
+                            android:scrollbars="none" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="20dp"
+                            android:gravity="left"
+                            android:orientation="horizontal" >
+
+                            <!-- friend search bar -->
+
+
+                            <!-- profile info starts here -->
+
+
+                            <TextView
+                                android:id="@+id/userName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
+                                android:textColor="#333"
+                                android:textSize="18sp" />
+                        </LinearLayout>
+
+                        <TableLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_marginTop="10dp" >
+
+                            <TableRow>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="left"
+                                    android:text="Gender"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/userGender"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="left"
+                                    android:layout_marginLeft="10dp"
+                                    android:textSize="16sp" />
+                            </TableRow>
+
+                            <TableRow>
+
+                                <View
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="0.5dp"
+                                    android:layout_marginBottom="5dp"
+                                    android:layout_marginTop="5dp"
+                                    android:layout_span="2"
+                                    android:layout_weight="1"
+                                    android:background="#999" />
+                            </TableRow>
+
+                            <TableRow>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="left"
+                                    android:text="Email"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/userEmail"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="left"
+                                    android:layout_marginLeft="10dp"
+                                    android:textSize="16sp" />
+                            </TableRow>
+                        </TableLayout>
+
+
+                        <Button
+                            android:id="@+id/logout_button"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/custom_logout_button"
+                            android:text="Logout" />
                     </LinearLayout>
-
-                    <TableLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginRight="5dp"
-                        android:layout_marginTop="10dp" >
-
-                        <TableRow>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="left"
-                                android:text="Gender"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/userGender"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="left"
-                                android:layout_marginLeft="10dp"
-                                android:textSize="16sp" />
-                        </TableRow>
-
-                        <TableRow>
-
-                            <View
-                                android:layout_width="wrap_content"
-                                android:layout_height="0.5dp"
-                                android:layout_marginBottom="5dp"
-                                android:layout_marginTop="5dp"
-                                android:layout_span="2"
-                                android:layout_weight="1"
-                                android:background="#999" />
-                        </TableRow>
-
-                        <TableRow>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="left"
-                                android:text="Email"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/userEmail"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="left"
-                                android:layout_marginLeft="10dp"
-                                android:textSize="16sp" />
-                        </TableRow>
-                    </TableLayout>
-
-
-                    <Button
-                        android:id="@+id/logout_button"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/custom_logout_button"
-                        android:text="Logout" />
                 </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+            
+        </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
 </LinearLayout>
