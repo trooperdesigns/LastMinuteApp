@@ -19,6 +19,9 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 
@@ -33,9 +36,6 @@ public class EventDetailsActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_event_details);
 
-
-
-        textView = (TextView) findViewById(R.id.text1);
         imageView = (ParseImageView) findViewById(R.id.icon);
         //imageView.setFocusable(false);
 
@@ -58,7 +58,7 @@ public class EventDetailsActivity extends Activity {
 
         //textView.setText(objectId);
 
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Todo");
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Events");
         query.whereEqualTo("objectId", objectId);
         // First try to find from the cache and only then go to network
         query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE); // or CACHE_ONLY
@@ -75,14 +75,35 @@ public class EventDetailsActivity extends Activity {
                     }
 
                     // Add the title view
-                    TextView titleTextView = (TextView) findViewById(R.id.text1);
+                    TextView titleTextView = (TextView) findViewById(R.id.eventTitle);
                     titleTextView.setFocusable(false);
-                    titleTextView.setText(object.getString("title"));
+                    titleTextView.setText(object.getString("title").toUpperCase());
 
-                    // Add a reminder of how long this item has been outstanding
-                    TextView timestampView = (TextView) findViewById(R.id.timestamp);
-                    timestampView.setFocusable(false);
-                    timestampView.setText(object.getCreatedAt().toString());
+                    // TextView for Location (using details for dummy)
+                    TextView locationTextView = (TextView) findViewById(R.id.eventLocation);
+                    locationTextView.setFocusable(false);
+                    locationTextView.setText(object.getString("details").toUpperCase());
+
+                    // get Date object and use for formatting
+                    Date startDate = object.getDate("startTime");
+                    Date endDate = object.getDate("endTime");
+
+                    SimpleDateFormat dateFormat;
+
+                    dateFormat = new SimpleDateFormat("MM");
+                    String month = getMonthName(Integer.parseInt(dateFormat.format(startDate))).toUpperCase();
+
+                    // textView for Date
+                    dateFormat = new SimpleDateFormat(" dd yyyy");
+                    TextView dateTextView = (TextView) findViewById(R.id.eventDate);
+                    dateTextView.setFocusable(false);
+                    dateTextView.setText(month + dateFormat.format(startDate));
+
+                    // textView for start time
+                    dateFormat = new SimpleDateFormat("hh:mma");
+                    TextView timeTextView = (TextView) findViewById(R.id.eventTime);
+                    timeTextView.setFocusable(false);
+                    timeTextView.setText(dateFormat.format(startDate) + " - " + dateFormat.format(endDate));
                 }
                 else {
                     textView.setText(e.getLocalizedMessage());
@@ -90,6 +111,16 @@ public class EventDetailsActivity extends Activity {
             }
         });
 
+    }
+
+    String getMonthName(int num) {
+        String month = "wrong";
+        DateFormatSymbols dfs = new DateFormatSymbols();
+        String[] months = dfs.getMonths();
+        if (num >= 0 && num <= 11 ) {
+            month = months[num];
+        }
+        return month;
     }
 
 }

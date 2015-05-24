@@ -1,6 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:paddingTop="7dp"
+    android:paddingBottom="7dp"
     android:gravity="center_vertical" >
 
     <com.parse.ParseImageView
@@ -17,16 +19,33 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/text1"
+            android:id="@+id/eventTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            android:textSize="16dp"
+            android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/timestamp"
+            android:id="@+id/eventLocation"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/eventDate"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:textSize="16dp"/>
+
+        <TextView
+            android:id="@+id/eventTime"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:textSize="16dp"/>
     </LinearLayout>
 
 </LinearLayout>
