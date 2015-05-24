@@ -61,7 +61,7 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
 
     private TextView message;
     private PagerTitleStrip titleStrip;
-    public static SlidingUpPanelLayout settingsPanel;
+    private SlidingUpPanelLayout settingsPanel;
     private int numEvents;
     private ParseUser currentUser;
     private TextView userNameView, userGenderView, userEmailView;
@@ -158,7 +158,7 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
 
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
-                        MainActivity.settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);MainActivity.settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                        settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                         return false;
                     }
                 });

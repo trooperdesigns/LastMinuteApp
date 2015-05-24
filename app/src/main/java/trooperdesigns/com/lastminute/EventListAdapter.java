@@ -107,20 +107,4 @@ public class EventListAdapter extends ParseQueryAdapter implements Filterable {
         return filter;
 	}
 
-	@Override
-	public boolean isEnabled(int position) {
-
-		// if panel isn't closed (i.e. expanded, anchored, or draggin), close panel if clicking outside
-		if(MainActivity.settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED
-				|| MainActivity.settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED
-				|| MainActivity.settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.DRAGGING){
-			//Toast.makeText(super.getContext(), MainActivity.settingsPanel.getPanelState().toString(), Toast.LENGTH_SHORT).show();
-			//MainActivity.settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);MainActivity.settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-			return false;
-		}
-
-		super.isEnabled(position);
-		return true;
-	}
-
 }
