@@ -1,23 +1,34 @@
 package trooperdesigns.com.lastminute;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseImageView;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.squareup.picasso.Picasso;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -25,10 +36,22 @@ import java.util.Date;
 import java.util.List;
 
 
-public class EventDetailsActivity extends Activity {
+public class EventDetailsActivity extends FragmentActivity implements FragmentChangeListener {
 
     private TextView textView;
     private ParseImageView imageView;
+    private FrameLayout container;
+    private SlidingUpPanelLayout settingsPanel;
+    private LinearLayout sliderHelper;
+    private ImageView slideIcon;
+
+    private GridView gridView;
+    private Integer[] mThumbIds = {
+            R.drawable.settings_icon,
+            R.drawable.settings_icon,
+            R.drawable.settings_icon,
+            R.drawable.settings_icon
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,82 +59,122 @@ public class EventDetailsActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_event_details);
 
-        imageView = (ParseImageView) findViewById(R.id.icon);
-        //imageView.setFocusable(false);
+        // container for current fragment
+        container = (FrameLayout) findViewById(R.id.event_details_fragment);
+        slideIcon = (ImageView) findViewById(R.id.settings_icon);
+        sliderHelper = (LinearLayout) findViewById(R.id.slider_helper);
+        settingsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
 
-
-        Intent i = getIntent();
-        Bundle bundle = i.getExtras();
-        String objectId = bundle.getString("objectId");
-        String title = bundle.getString("title");
-        String createdAt = bundle.getString("createdAt");
-        String imgUrl = bundle.getString("image");
-
-        Toast toast = Toast.makeText(this, objectId + "," + title + "," + createdAt + "," + imgUrl,
-                Toast.LENGTH_SHORT);
-        toast.show();
-        //textView.setText(imgUrl);
-
-
-        //Picasso.with(this).load(imgUrl).into(imageView);
-
-
-        //textView.setText(objectId);
-
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Events");
-        query.whereEqualTo("objectId", objectId);
-        // First try to find from the cache and only then go to network
-        query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE); // or CACHE_ONLY
-        // Execute the query to find the object with ID
-        query.findInBackground(new FindCallback<ParseObject>() {
+        settingsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
-            public void done(List<ParseObject> list, ParseException e) {
-                if (e == null) {
-                    ParseObject object = list.get(0);
-                    ParseFile imageFile = object.getParseFile("image");
-                    if (imageFile != null) {
-                        imageView.setParseFile(imageFile);
-                        imageView.loadInBackground();
+            public void onPanelSlide(View view, float slideOffset) {
+                sliderHelper.setOnTouchListener(new View.OnTouchListener(){
+
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return false;
                     }
+                });
+            }
 
-                    // Add the title view
-                    TextView titleTextView = (TextView) findViewById(R.id.eventTitle);
-                    titleTextView.setFocusable(false);
-                    titleTextView.setText(object.getString("title").toUpperCase());
+            @Override
+            public void onPanelCollapsed(View view) {
+                slideIcon.setRotation(0f);
 
-                    // TextView for Location (using details for dummy)
-                    TextView locationTextView = (TextView) findViewById(R.id.eventLocation);
-                    locationTextView.setFocusable(false);
-                    locationTextView.setText(object.getString("details").toUpperCase());
+            }
 
-                    // get Date object and use for formatting
-                    Date startDate = object.getDate("startTime");
-                    Date endDate = object.getDate("endTime");
+            @Override
+            public void onPanelExpanded(View view) {
+                slideIcon.setRotation(180f);
 
-                    SimpleDateFormat dateFormat;
+                sliderHelper.setOnTouchListener(new View.OnTouchListener(){
 
-                    dateFormat = new SimpleDateFormat("MM");
-                    String month = getMonthName(Integer.parseInt(dateFormat.format(startDate))).toUpperCase();
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                        return false;
+                    }
+                });
 
-                    // textView for Date
-                    dateFormat = new SimpleDateFormat(" dd yyyy");
-                    TextView dateTextView = (TextView) findViewById(R.id.eventDate);
-                    dateTextView.setFocusable(false);
-                    dateTextView.setText(month + dateFormat.format(startDate));
+            }
 
-                    // textView for start time
-                    dateFormat = new SimpleDateFormat("hh:mma");
-                    TextView timeTextView = (TextView) findViewById(R.id.eventTime);
-                    timeTextView.setFocusable(false);
-                    timeTextView.setText(dateFormat.format(startDate) + " - " + dateFormat.format(endDate));
+            @Override
+            public void onPanelAnchored(View view) {
+                slideIcon.setRotation(180f);
+            }
+
+            @Override
+            public void onPanelHidden(View view) {
+
+            }
+        });
+
+        gridView = (GridView) findViewById(R.id.gridview);
+        gridView.setAdapter(new GridAdapter(this));
+        gridView.setNumColumns(4);
+
+        // disable gridView scrolling so it doesn't get in the way
+        gridView.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                    return true;
                 }
-                else {
-                    textView.setText(e.getLocalizedMessage());
+                return false;
+            }
+
+        });
+
+        // gridView item click listener
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+                switch (position) {
+                    case 0:
+                        Intent i = new Intent(EventDetailsActivity.this, SettingsActivity.class);
+                        startActivity(i);
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        break;
                 }
             }
         });
 
+        // Check that the activity is using the layout version with
+        // the fragment_container FrameLayout
+        if (findViewById(R.id.event_details_fragment) != null) {
+
+            // However, if we're being restored from a previous state,
+            // then we don't need to do anything and should return or else
+            // we could end up with overlapping fragments.
+            if (savedInstanceState != null) {
+                return;
+            }
+
+            // Create a new Fragment to be placed in the activity layout
+            EventDetailsFragment eventDetailsFrag = new EventDetailsFragment();
+            eventDetailsFrag.setArguments(getIntent().getExtras());
+
+            // In case this activity was started with special instructions from an
+            // Intent, pass the Intent's extras to the fragment as arguments
+            eventDetailsFrag.setArguments(getIntent().getExtras());
+
+            // Add the fragment to the 'fragment_container' FrameLayout
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.event_details_fragment, eventDetailsFrag).commit();
+        }
+
     }
+
+
 
     String getMonthName(int num) {
         String month = "wrong";
@@ -123,4 +186,69 @@ public class EventDetailsActivity extends Activity {
         return month;
     }
 
+    @Override
+    public void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(container.getId(), fragment, fragment.toString());
+        fragmentTransaction.addToBackStack(fragment.toString());
+        fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // if sliding panel is open, close it
+        if (settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED ||
+                settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED) {
+            settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        } else {
+            // otherwise do as it normally would (finish())
+            super.onBackPressed();
+        }
+
+        return;
+    }
+
+    public class GridAdapter extends BaseAdapter {
+
+        private Context mContext;
+
+        public GridAdapter(Context c) {
+            mContext = c;
+        }
+
+        @Override
+        public int getCount() {
+            return mThumbIds.length;
+        }
+
+        @Override
+        public Object getItem(int arg0) {
+            return mThumbIds[arg0];
+        }
+
+        @Override
+        public long getItemId(int arg0) {
+            return arg0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            View grid;
+
+            if (convertView == null) {
+                grid = new View(mContext);
+                LayoutInflater inflater = getLayoutInflater();
+                grid = inflater.inflate(R.layout.settings_grid, parent, false);
+            } else {
+                grid = (View) convertView;
+            }
+
+            ImageView imageView = (ImageView) grid.findViewById(R.id.image);
+            imageView.setImageResource(mThumbIds[position]);
+
+            return grid;
+        }
+    }
 }

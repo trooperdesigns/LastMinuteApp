@@ -139,9 +139,13 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
         settingsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View view, float slideOffset) {
-                if(settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+                sliderHelper.setOnTouchListener(new View.OnTouchListener(){
 
-                }
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return false;
+                    }
+                });
             }
 
             @Override
@@ -237,10 +241,6 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
         Fragment fr = new NewEventFragment();
         FragmentChangeListener fc = (FragmentChangeListener) this;
         fc.replaceFragment(fr);
-    }
-
-    public SlidingUpPanelLayout getSlidingPanel(){
-        return this.settingsPanel;
     }
 
     @Override
@@ -352,7 +352,6 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
             View grid;
 
             if (convertView == null) {
-                grid = new View(mContext);
                 LayoutInflater inflater = getLayoutInflater();
                 grid = inflater.inflate(R.layout.settings_grid, parent, false);
             } else {
