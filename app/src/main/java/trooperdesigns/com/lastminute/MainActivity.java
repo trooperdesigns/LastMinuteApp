@@ -3,9 +3,7 @@ package trooperdesigns.com.lastminute;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Matrix;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -13,20 +11,15 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -42,7 +35,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.Locale;
 
-public class MainActivity extends FragmentActivity implements FragmentChangeListener {
+public class MainActivity extends FragmentActivity implements FragmentChangeListener, FragmentListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -70,9 +63,11 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
     private GridView gridView;
     private ImageView slideIcon;
     private LinearLayout sliderHelper;
+    private Button viewAllContactsButton;
 
     private EventsFragment eventsFragment;
     private NewEventFragment newEventFragment;
+    private RootFragment rootFragment;
 
     private Integer[] mThumbIds = {
             R.drawable.settings_icon,
@@ -274,14 +269,23 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
         return true;
     }
 
+    @Override
+    public void onSwitchToNextFragment() {
+
+    }
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+        private final FragmentManager mFragmentManager;
+        private Fragment mFragmentAtPos0;
+
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
+            mFragmentManager = fm;
         }
 
         @Override
@@ -297,17 +301,27 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
                     return eventsFragment;
                 case 1:
                     // Create new event fragment
-                    Log.d("fragment", "left fragment");
-                    newEventFragment = new NewEventFragment();
-                    return newEventFragment;
+                    Log.d("fragment", "right fragment");
+                    // root fragment used so we can replace rootFragment with NewEventFragment and ContactsFragment
+                    rootFragment = new RootFragment();
+                    return rootFragment;
+
             }
             return null;
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
+            // Show 2 total pages.
             return 2;
+        }
+
+        @Override
+        public int getItemPosition(Object object)
+        {
+            if (object instanceof NewEventFragment && mFragmentAtPos0 instanceof AllContactsFragment)
+                return POSITION_NONE;
+            return POSITION_UNCHANGED;
         }
 
         @Override
@@ -364,5 +378,7 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
             return grid;
         }
     }
+
+
 
 }

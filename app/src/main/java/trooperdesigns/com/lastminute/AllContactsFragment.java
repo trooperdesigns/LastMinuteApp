@@ -137,16 +137,20 @@ public class AllContactsFragment extends ListFragment {
         //Toast.makeText(getActivity(), object.getString("title"), Toast.LENGTH_SHORT).show();
     }
 
+    public static AllContactsFragment newInstance() {
+        AllContactsFragment f = new AllContactsFragment();
+        return f;
+    }
 
 
     public void setNumEvents(){
         numEvents = listView.getCount();
-        EventDetailsActivity containerActivity = (EventDetailsActivity) getActivity();
+        //EventDetailsActivity containerActivity = (EventDetailsActivity) getActivity();
         //containerActivity.mSectionsPagerAdapter.setNumevents();
     }
 
     public void update(){
-        EventDetailsActivity containerActivity = (EventDetailsActivity) getActivity();
+        //EventDetailsActivity containerActivity = (EventDetailsActivity) getActivity();
         //containerActivity.update();
     }
 

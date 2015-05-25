@@ -31,6 +31,7 @@ public class AllContactsListAdapter extends ParseQueryAdapter implements Filtera
         super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
             public ParseQuery<ParseObject> create() {
                 ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Todo");
+                //query.whereContains("title", "asdf");
                 // First try to find from the cache and only then go to network
                 query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE); // or CACHE_ONLY
                 //query.whereEqualTo("highPri", true);
