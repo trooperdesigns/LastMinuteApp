@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -55,7 +56,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 
 
 
-		ParseQuery<ParseObject> query = ParseQuery.getQuery("Events");
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("Event");
 		query.whereEqualTo("objectId", objectId);
 		// First try to find from the cache and only then go to network
 		query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE); // or CACHE_ONLY

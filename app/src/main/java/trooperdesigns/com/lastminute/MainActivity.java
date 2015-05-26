@@ -281,7 +281,7 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         private final FragmentManager mFragmentManager;
-        private Fragment mFragmentAtPos0;
+        private int currentPos;
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -292,6 +292,8 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // return the selected page
+
+            this.currentPos = position;
 
             switch (position) {
                 case 0:
@@ -317,14 +319,6 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
         }
 
         @Override
-        public int getItemPosition(Object object)
-        {
-            if (object instanceof NewEventFragment && mFragmentAtPos0 instanceof AllContactsFragment)
-                return POSITION_NONE;
-            return POSITION_UNCHANGED;
-        }
-
-        @Override
         public CharSequence getPageTitle(int position) {
             Locale l = Locale.getDefault();
             switch (position) {
@@ -334,6 +328,10 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
                     return getString(R.string.title_create).toUpperCase(l);
             }
             return null;
+        }
+
+        public int getCurrentPos(){
+            return currentPos;
         }
     }
 

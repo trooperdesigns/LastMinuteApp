@@ -7,8 +7,7 @@
     </style>
 
     <!-- ActionBar styles -->
-    <style name="MyActionBar"
-        parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+    <style name="MyActionBar" parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
         <!--<item name="android:background">@drawable/settings_icon</item>-->
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>

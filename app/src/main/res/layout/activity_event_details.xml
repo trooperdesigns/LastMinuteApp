@@ -11,7 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="bottom"
-        sothree:umanoParalaxOffset="50dp"
         sothree:umanoPanelHeight="40dp"
         sothree:umanoShadowHeight="4dp" >
 

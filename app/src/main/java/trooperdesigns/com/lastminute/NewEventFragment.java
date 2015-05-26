@@ -1,5 +1,6 @@
 package trooperdesigns.com.lastminute;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -8,10 +9,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
+
+import com.parse.ParseAnonymousUtils;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseRelation;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
+
+import java.util.Calendar;
+import java.util.Date;
 
 public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 	private Button viewAllContactsButton;
+	private Button createButton;
+
+	// variables used for parse
+	ParseUser currentUser;
+	ParseRelation<ParseObject> invitees;
+	ParseObject invitation;
+	ParseObject event;
 	
 
 	public NewEventFragment() {
@@ -21,8 +40,83 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 		
 		View rootView = inflater.inflate(R.layout.fragment_new_event, container, false);
 
+		// don't need this, just keep for now (
+		// determine if current user is anonymous
+		if (ParseAnonymousUtils.isLinked(ParseUser.getCurrentUser())) {
+			// if user is anonymous, send user to login page
+			Intent i = new Intent(getActivity(), LoginActivity.class);
+			startActivity(i);
+
+			getActivity().finish();
+		} else {
+			// if user is not anonymous
+			// get current user data from parse.com
+			ParseUser currentUser = ParseUser.getCurrentUser();
+			if (currentUser != null) {
+				// let logged in users stay
+				this.currentUser = currentUser;
+			} else {
+				// send user to login page if currentUser doesn't exist
+				Intent i = new Intent(getActivity(), LoginActivity.class);
+				startActivity(i);
+
+				getActivity().finish();
+			}
+
+		}
+
 		viewAllContactsButton = (Button) rootView.findViewById(R.id.testButton);
 		viewAllContactsButton.setOnClickListener(this);
+
+		createButton = (Button) rootView.findViewById(R.id.create_button);
+		createButton.setOnClickListener(new View.OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				event = new ParseObject("Event");
+				event.put("title", "Android Test");
+				event.put("details", "2232 Langham");
+				event.put("status", 0);
+				Calendar c = Calendar.getInstance();
+				Date date = c.getTime();
+				event.put("startTime", date);
+				event.put("endTime", date);
+				event.put("minAttendees", 1);
+
+				// loop through to create invitation for every single invitee
+				invitation = new ParseObject("Invitation");
+				invitation.put("user", currentUser);
+				invitation.put("status", 0);
+
+				// save invitation object first so event can save	 the relation to it
+				invitation.saveInBackground(new SaveCallback() {
+					@Override
+					public void done(ParseException e) {
+
+						if(e == null){
+							// when invitation successfully saved, use it for relation in event
+							invitees = event.getRelation("invitees");
+							invitees.add(invitation);
+
+							event.saveInBackground(new SaveCallback() {
+								@Override
+								public void done(ParseException e) {
+									if(e == null){
+										// success
+										Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+									} else {
+										Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+									}
+								}
+							});
+						} else {
+							Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+						}
+					}
+				});
+
+			}
+		});
 
 		return rootView;
 	}
@@ -41,6 +135,8 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 		FragmentManager fragmentManager = getFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 		fragmentTransaction.replace(R.id.root_frame, fragment, fragment.toString());
+
+		//fragmentTransaction.setCustomAnimations(R.anim.push_left_in, R.anim.push_left_out);
 		fragmentTransaction.addToBackStack(fragment.toString());
 		fragmentTransaction.commit();
 

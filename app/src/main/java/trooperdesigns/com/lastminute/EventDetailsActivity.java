@@ -7,33 +7,27 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseImageView;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 
 public class EventDetailsActivity extends FragmentActivity implements FragmentChangeListener {
@@ -44,6 +38,7 @@ public class EventDetailsActivity extends FragmentActivity implements FragmentCh
     private SlidingUpPanelLayout settingsPanel;
     private LinearLayout sliderHelper;
     private ImageView slideIcon;
+    private Toolbar toolbar;
 
     private GridView gridView;
     private Integer[] mThumbIds = {
@@ -64,6 +59,8 @@ public class EventDetailsActivity extends FragmentActivity implements FragmentCh
         slideIcon = (ImageView) findViewById(R.id.settings_icon);
         sliderHelper = (LinearLayout) findViewById(R.id.slider_helper);
         settingsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+
+
 
         settingsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
@@ -208,6 +205,20 @@ public class EventDetailsActivity extends FragmentActivity implements FragmentCh
 
         return;
     }
+
+    // TODO: adds action bar at bottom, need to integrate into custom action bar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+        return false;
+    }
+
 
     public class GridAdapter extends BaseAdapter {
 

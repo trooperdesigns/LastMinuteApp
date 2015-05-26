@@ -30,7 +30,7 @@ public class EventListAdapter extends ParseQueryAdapter implements Filterable {
 		// Todos marked as high-pri
 		super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
 			public ParseQuery<ParseObject> create() {
-				ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Events");
+				ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Event");
 				// First try to find from the cache and only then go to network
 				query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE); // or CACHE_ONLY
 				//query.whereEqualTo("highPri", true);
@@ -66,6 +66,8 @@ public class EventListAdapter extends ParseQueryAdapter implements Filterable {
 		TextView locationTextView = (TextView) v.findViewById(R.id.eventLocation);
 		locationTextView.setFocusable(false);
 		locationTextView.setText(object.getString("details").toUpperCase());
+
+		// TODO: Check that dates exist, otherwise parsing error
 
 		// get Date object and use for formatting
 		Date startDate = object.getDate("startTime");
