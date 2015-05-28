@@ -201,10 +201,12 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
 
                 switch (position) {
                     case 0:
-                        Intent i = new Intent(MainActivity.this, SettingsActivity.class);
-                        startActivity(i);
+                        Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                        startActivity(settingsIntent);
                         break;
                     case 1:
+                        Intent viewContactsIntent = new Intent(MainActivity.this, ViewContactsActivity.class);
+                        startActivity(viewContactsIntent);
                         break;
                     case 2:
                         break;

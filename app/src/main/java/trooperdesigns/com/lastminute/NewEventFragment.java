@@ -11,15 +11,23 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.parse.FunctionCallback;
 import com.parse.ParseAnonymousUtils;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.json.JSONArray;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class NewEventFragment extends Fragment implements View.OnClickListener {
 
@@ -31,7 +39,9 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 	ParseRelation<ParseObject> invitees;
 	ParseObject invitation;
 	ParseObject event;
-	
+	ParseUser foundUser;
+	ArrayList<String> list;
+
 
 	public NewEventFragment() {
 	}
@@ -73,6 +83,8 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 			@Override
 			public void onClick(View v) {
+
+
 				event = new ParseObject("Event");
 				event.put("title", "Android Test");
 				event.put("details", "2232 Langham");
@@ -82,33 +94,33 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 				event.put("startTime", date);
 				event.put("endTime", date);
 				event.put("minAttendees", 1);
+				event.put("creator", currentUser);
 
-				// loop through to create invitation for every single invitee
-				invitation = new ParseObject("Invitation");
-				invitation.put("user", currentUser);
-				invitation.put("status", 0);
+				list = new ArrayList<>();
+				list.add("justin");
+				list.add("justin2");
 
-				// save invitation object first so event can save	 the relation to it
-				invitation.saveInBackground(new SaveCallback() {
+				event.saveInBackground(new SaveCallback() {
 					@Override
 					public void done(ParseException e) {
+						if (e == null) {
+							// success
 
-						if(e == null){
-							// when invitation successfully saved, use it for relation in event
-							invitees = event.getRelation("invitees");
-							invitees.add(invitation);
+							HashMap<String, Object> newEvent = new HashMap<>();
+							newEvent.put("event", event.getObjectId());
+							newEvent.put("invitees", list);
 
-							event.saveInBackground(new SaveCallback() {
-								@Override
-								public void done(ParseException e) {
-									if(e == null){
+							ParseCloud.callFunctionInBackground("sendInvitations", newEvent, new FunctionCallback<String>() {
+								public void done(String response, ParseException e) {
+									if (e == null) {
 										// success
-										Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+										Toast.makeText(getActivity(), "Success: " + response, Toast.LENGTH_SHORT).show();
 									} else {
-										Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+										Toast.makeText(getActivity(), "Error: " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
 									}
 								}
 							});
+
 						} else {
 							Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
 						}
