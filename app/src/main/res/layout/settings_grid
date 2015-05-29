@@ -17,7 +17,6 @@
         android:id="@+id/grid_item_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Settings"/>
+        android:layout_gravity="center"/>
 
 </LinearLayout>

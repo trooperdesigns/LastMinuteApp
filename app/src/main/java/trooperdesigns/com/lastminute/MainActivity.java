@@ -72,7 +72,6 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
     private Integer[] mThumbIds = {
             R.drawable.settings_icon,
             R.drawable.settings_icon,
-            R.drawable.settings_icon,
             R.drawable.settings_icon
     };
 
@@ -177,7 +176,7 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
 
         gridView = (GridView) findViewById(R.id.gridview);
         gridView.setAdapter(new GridAdapter(this));
-        gridView.setNumColumns(4);
+        gridView.setNumColumns(3);
 
         // disable gridView scrolling so it doesn't get in the way
         gridView.setOnTouchListener(new View.OnTouchListener() {
@@ -374,6 +373,20 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
 
             ImageView imageView = (ImageView) grid.findViewById(R.id.image);
             imageView.setImageResource(mThumbIds[position]);
+
+            TextView tv = (TextView) grid.findViewById(R.id.grid_item_title);
+
+            switch(position){
+                case(0):
+                    tv.setText("Profile");
+                    break;
+                case(1):
+                    tv.setText("Contacts");
+                    break;
+                case(2):
+                    tv.setText("Settings");
+                    break;
+            }
 
             return grid;
         }

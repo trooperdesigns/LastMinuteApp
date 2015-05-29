@@ -16,11 +16,15 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.SectionIndexer;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import trooperdesigns.com.lastminute.util.StringMatcher;
+import trooperdesigns.com.lastminute.widget.IndexableListView;
 
 public class ViewContactsActivity extends Activity implements AdapterView.OnItemClickListener {
 
@@ -35,7 +39,7 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
         setContentView(R.layout.activity_view_contacts);
 
         getAllContacts(this.getContentResolver());
-        ListView lv = (ListView) findViewById(R.id.lv);
+        IndexableListView lv = (IndexableListView) findViewById(R.id.lv);
         ma = new MyAdapter();
         lv.setAdapter(ma);
         lv.setOnItemClickListener(this);
@@ -76,10 +80,10 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
     public void getAllContacts(ContentResolver cr) {
 
         Cursor phones = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
+        // iterate through all contacts and add names and numbers to their own arraylists
         while (phones.moveToNext()) {
             String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            System.out.println(".................." + phoneNumber);
             name1.add(name);
             phno1.add(phoneNumber);
         }
@@ -87,11 +91,12 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
         phones.close();
     }
 
-    class MyAdapter extends BaseAdapter implements CompoundButton.OnCheckedChangeListener {
+    class MyAdapter extends BaseAdapter implements CompoundButton.OnCheckedChangeListener, SectionIndexer {
         private SparseBooleanArray mCheckStates;
         LayoutInflater mInflater;
         TextView tv1, tv;
         CheckBox cb;
+        private String mSections = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
         MyAdapter() {
             mCheckStates = new SparseBooleanArray(name1.size());
@@ -107,7 +112,7 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
         @Override
         public Object getItem(int position) {
             // TODO Auto-generated method stub
-            return position;
+            return name1.get(position);
         }
 
         @Override
@@ -155,6 +160,41 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
             // TODO Auto-generated method stub
 
             mCheckStates.put((Integer) buttonView.getTag(), isChecked);
+        }
+
+
+
+        @Override
+        public int getPositionForSection(int section) {
+            // If there is no item for current section, previous section will be selected
+            for (int i = section; i >= 0; i--) {
+                for (int j = 0; j < getCount(); j++) {
+                    if (i == 0) {
+                        // For numeric section
+                        for (int k = 0; k <= 9; k++) {
+                            if (StringMatcher.match(String.valueOf(getItem(j).toString().charAt(0)), String.valueOf(k)))
+                                return j;
+                        }
+                    } else {
+                        if (StringMatcher.match(String.valueOf(getItem(j).toString().charAt(0)), String.valueOf(mSections.charAt(i))))
+                            return j;
+                    }
+                }
+            }
+            return 0;
+        }
+
+        @Override
+        public int getSectionForPosition(int position) {
+            return 0;
+        }
+
+        @Override
+        public Object[] getSections() {
+            String[] sections = new String[mSections.length()];
+            for (int i = 0; i < mSections.length(); i++)
+                sections[i] = String.valueOf(mSections.charAt(i));
+            return sections;
         }
     }
 }
