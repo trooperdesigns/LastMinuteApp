@@ -166,6 +166,15 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
             @Override
             public void onPanelAnchored(View view) {
                 slideIcon.setRotation(180f);
+
+                sliderHelper.setOnTouchListener(new View.OnTouchListener() {
+
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                        return false;
+                    }
+                });
             }
 
             @Override
@@ -246,8 +255,16 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
                 settingsPanel.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED) {
             settingsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
-            // otherwise do as it normally would (finish())
-            super.onBackPressed();
+            // if settings panel collapsed but not on main page, switch to page 0
+            if(mViewPager.getCurrentItem() == 1){
+                // TODO: if viewing all contacts to invite in event creation page (fragment), can't go back to creation page
+                //mViewPager.setCurrentItem(0);
+                super.onBackPressed();
+            } else {
+                // otherwise do as it normally would (finish())
+                super.onBackPressed();
+            }
+
         }
 
         return;
@@ -391,7 +408,5 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
             return grid;
         }
     }
-
-
 
 }

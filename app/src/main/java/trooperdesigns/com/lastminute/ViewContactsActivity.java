@@ -82,13 +82,13 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
             public void onClick(View v) {
                 StringBuilder checkedcontacts = new StringBuilder();
                 System.out.println(".............." + contactsAdapter.mCheckStates.size());
-                for (int i = 0; i < name.size(); i++)
+                for (int i = 0; i < filteredData.size(); i++)
 
                 {
                     if (contactsAdapter.mCheckStates.get(i) == true) {
-                        checkedcontacts.append(name.get(i).toString() + "\n");
+                        checkedcontacts.append(filteredData.get(i).toString() + "\n");
                     } else {
-                        System.out.println("Not Checked......" + name.get(i).toString());
+                        System.out.println("Not Checked......" + filteredData.get(i).toString());
                     }
 
                 }
@@ -157,7 +157,7 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
             this.filteredPhoneData = phoneData;
             this.originalPhoneData = phoneData;
 
-            mCheckStates = new SparseBooleanArray(originalData.size());
+            mCheckStates = new SparseBooleanArray(filteredData.size());
 
             mInflater = LayoutInflater.from(context);
             mInflater = (LayoutInflater) ViewContactsActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

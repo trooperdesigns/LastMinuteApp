@@ -97,6 +97,8 @@
                             android:id="@+id/gridview"
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
+                            android:paddingLeft="20dp"
+                            android:paddingRight="20dp"
                             android:numColumns="auto_fit"
                             android:verticalSpacing="20dp"
                             android:horizontalSpacing="10dp"
