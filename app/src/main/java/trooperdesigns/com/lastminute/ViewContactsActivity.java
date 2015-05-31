@@ -198,8 +198,6 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
                 // we want to bind data to.
                 holder = new ViewHolder();
                 holder.name = (TextView) convertView.findViewById(R.id.contact_name);
-                holder.checked = (CheckBox) convertView.findViewById(R.id.contact_is_checked);
-                //holder.phone = (TextView) convertView.findViewById(R.id.textView2);
 
                 // Bind the data efficiently with the holder.
                 convertView.setTag(holder);
@@ -211,14 +209,12 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
 
             // If weren't re-ordering this you could rely on what you set last time
             holder.name.setText(filteredContacts.get(position).getName());
-            holder.checked.setChecked(filteredContacts.get(position).getIsChecked());
 
             return convertView;
         }
 
         public class ViewHolder {
             TextView name;
-            CheckBox checked;
         }
 
         @Override
@@ -226,8 +222,6 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
                                      boolean isChecked) {
             filteredContacts.get((Integer) buttonView.getTag()).setIsChecked(isChecked);
         }
-
-
 
         @Override
         public int getPositionForSection(int section) {

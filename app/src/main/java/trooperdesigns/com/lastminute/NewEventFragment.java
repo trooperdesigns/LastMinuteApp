@@ -156,7 +156,9 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		openAllContactsFragment();
+		//openAllContactsFragment();
+		Intent intent = new Intent(getActivity(), ViewContactsActivity.class);
+		startActivity(intent);
 	}
 
 
