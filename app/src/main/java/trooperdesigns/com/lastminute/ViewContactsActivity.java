@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,15 +32,13 @@ import trooperdesigns.com.lastminute.widget.IndexableListView;
 
 public class ViewContactsActivity extends Activity implements AdapterView.OnItemClickListener {
 
-    List<String> name = new ArrayList<String>();
-    List<String> phone = new ArrayList<String>();
     ContactsAdapter contactsAdapter;
 
-    private List<String> originalData = null;
-    private List<String> filteredData = null;
+    private List<Contact> originalContacts = new ArrayList<>();
+    private List<Contact> filteredContacts = new ArrayList<>();
 
-    Button select;
-    EditText search;
+    private Button select;
+    private EditText search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,26 +66,31 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
 
         getAllContacts(this.getContentResolver());
         IndexableListView lv = (IndexableListView) findViewById(R.id.lv);
-        contactsAdapter = new ContactsAdapter(getApplicationContext(), name, phone);
+        contactsAdapter = new ContactsAdapter(getApplicationContext(), originalContacts);
+        lv.setClickable(true);
         lv.setAdapter(contactsAdapter);
         lv.setOnItemClickListener(this);
         lv.setItemsCanFocus(false);
         lv.setTextFilterEnabled(true);
+
         // adding
         select = (Button) findViewById(R.id.button1);
         select.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
+
                 StringBuilder checkedcontacts = new StringBuilder();
-                System.out.println(".............." + contactsAdapter.mCheckStates.size());
-                for (int i = 0; i < filteredData.size(); i++)
+                System.out.println(".............." + originalContacts.size());
+                // iterate through all contacts, and if checked, append to stringbuilder
+                for (int i = 0; i < originalContacts.size(); i++)
 
                 {
-                    if (contactsAdapter.mCheckStates.get(i) == true) {
-                        checkedcontacts.append(filteredData.get(i).toString() + "\n");
+                    if (originalContacts.get(i).getIsChecked() == true) {
+                        // append names of checked contacts to StringBuilder for Toast output
+                        checkedcontacts.append(originalContacts.get(i).getName() + "\n");
                     } else {
-                        System.out.println("Not Checked......" + filteredData.get(i).toString());
+                        System.out.println("Not Checked......" + originalContacts.get(i).getName());
                     }
 
                 }
@@ -117,47 +119,35 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
     }
 
     @Override
-    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-        // TODO Auto-generated method stub
-        contactsAdapter.toggle(arg2);
+    public void onItemClick(AdapterView<?> arg0, View view, int position, long arg3) {
+        filteredContacts.get(position).toggle();
     }
 
     public void getAllContacts(ContentResolver cr) {
 
         Cursor phones = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
-        // iterate through all contacts and add names and numbers to their own arraylists
+        // initialize Contact object for each contact in phonebook
         while (phones.moveToNext()) {
             String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            this.name.add(name);
-            phone.add(phoneNumber);
+            originalContacts.add(new Contact(name, phoneNumber, false));
         }
 
         phones.close();
     }
 
     class ContactsAdapter extends BaseAdapter implements CompoundButton.OnCheckedChangeListener, SectionIndexer, Filterable {
-        private SparseBooleanArray mCheckStates;
-        TextView tv1, tv;
         CheckBox cb;
         private String mSections = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-
-        private List<String> originalPhoneData = null;
-
-        private List<String> filteredPhoneData = null;
         private LayoutInflater mInflater;
         private ItemFilter mFilter = new ItemFilter();
 
-        ContactsAdapter(Context context, List<String> nameData, List<String> phoneData) {
+        ContactsAdapter(Context context, List<Contact> contacts) {
 
-            filteredData = nameData ;
-            originalData = nameData ;
-
-            this.filteredPhoneData = phoneData;
-            this.originalPhoneData = phoneData;
-
-            mCheckStates = new SparseBooleanArray(filteredData.size());
+            // set originalContacts and filteredContacts as original Contacts list
+            originalContacts = contacts;
+            filteredContacts = contacts;
 
             mInflater = LayoutInflater.from(context);
             mInflater = (LayoutInflater) ViewContactsActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -165,36 +155,33 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
 
         @Override
         public int getCount() {
-            // TODO Auto-generated method stub
-            return filteredData.size();
+            return filteredContacts.size();
         }
 
         @Override
         public Object getItem(int position) {
-            // TODO Auto-generated method stub
-            return filteredData.get(position);
+            // return the name of the contact at that position (for listview)
+            return filteredContacts.get(position).getName();
         }
 
         @Override
         public long getItemId(int position) {
-            // TODO Auto-generated method stub
-
             return position;
         }
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
-            // TODO Auto-generated method stub
             View vi = convertView;
             if (convertView == null) vi = mInflater.inflate(R.layout.all_contacts_row, null);
-            TextView tv = (TextView) vi.findViewById(R.id.textView1);
-            //tv1 = (TextView) vi.findViewById(R.id.textView2);
 
-            cb = (CheckBox) vi.findViewById(R.id.checkBox1);
-            tv.setText("Name: " + filteredData.get(position));
+            TextView tv = (TextView) vi.findViewById(R.id.contact_name);
+            cb = (CheckBox) vi.findViewById(R.id.contact_is_checked);
+            tv.setText("Name: " + filteredContacts.get(position).getName());
+
+            // TODO: Uncomment next line when using phone number as username to query
             //tv1.setText("Phone No:" + phone.get(position));
             cb.setTag(position);
-            cb.setChecked(mCheckStates.get(position, false));
+            cb.setChecked(filteredContacts.get(position).getIsChecked());
             cb.setOnCheckedChangeListener(this);
 
             // A ViewHolder keeps references to children views to avoid unnecessary calls
@@ -210,11 +197,11 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
                 // Creates a ViewHolder and store references to the two children views
                 // we want to bind data to.
                 holder = new ViewHolder();
-                holder.name = (TextView) convertView.findViewById(R.id.textView1);
+                holder.name = (TextView) convertView.findViewById(R.id.contact_name);
+                holder.checked = (CheckBox) convertView.findViewById(R.id.contact_is_checked);
                 //holder.phone = (TextView) convertView.findViewById(R.id.textView2);
 
                 // Bind the data efficiently with the holder.
-
                 convertView.setTag(holder);
             } else {
                 // Get the ViewHolder back to get fast access to the TextView
@@ -223,37 +210,21 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
             }
 
             // If weren't re-ordering this you could rely on what you set last time
-            holder.name.setText(filteredData.get(position));
-            //holder.phone.setText(filteredPhoneData.get(position));
+            holder.name.setText(filteredContacts.get(position).getName());
+            holder.checked.setChecked(filteredContacts.get(position).getIsChecked());
 
             return convertView;
         }
 
         public class ViewHolder {
             TextView name;
-            TextView phone;
-        }
-
-        public boolean isChecked(int position) {
-            return mCheckStates.get(position, false);
-        }
-
-        public void setChecked(int position, boolean isChecked) {
-            mCheckStates.put(position, isChecked);
-            System.out.println("hello...........");
-            notifyDataSetChanged();
-        }
-
-        public void toggle(int position) {
-            setChecked(position, !isChecked(position));
+            CheckBox checked;
         }
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView,
                                      boolean isChecked) {
-            // TODO Auto-generated method stub
-
-            mCheckStates.put((Integer) buttonView.getTag(), isChecked);
+            filteredContacts.get((Integer) buttonView.getTag()).setIsChecked(isChecked);
         }
 
 
@@ -301,25 +272,27 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
             protected FilterResults performFiltering(CharSequence constraint) {
 
                 String filterString = constraint.toString().toLowerCase();
-
                 FilterResults results = new FilterResults();
 
-                final List<String> origList = originalData;
-
+                // remember original list
+                final List<Contact> origList = originalContacts;
                 int count = origList.size();
-                final ArrayList<String> nlist = new ArrayList<String>(count);
+
+                // create new list that will be used as filteredList
+                ArrayList<Contact> newList = new ArrayList<Contact>(count);
 
                 String filterableString ;
 
+                // populate new list based on filter criteria
                 for (int i = 0; i < count; i++) {
-                    filterableString = origList.get(i);
+                    filterableString = origList.get(i).getName();
                     if (filterableString.toLowerCase().contains(filterString)) {
-                        nlist.add(filterableString);
+                        newList.add(origList.get(i));
                     }
                 }
 
-                results.values = nlist;
-                results.count = nlist.size();
+                results.values = newList;
+                results.count = newList.size();
 
                 return results;
             }
@@ -327,12 +300,53 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
             @SuppressWarnings("unchecked")
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                filteredData = (ArrayList<String>) results.values;
-                //mCheckStates = new SparseBooleanArray(filteredData.size());
-
+                // set result of filter as the filteredContacts
+                filteredContacts = (ArrayList<Contact>) results.values;
                 notifyDataSetChanged();
             }
 
         }
+    }
+
+    // Contact class used to hold contact information
+    public class Contact {
+        private boolean isChecked;
+        private String name;
+        private String phone;
+
+        public Contact(String name, String phone, boolean isChecked) {
+            this.name = name;
+            this.phone = phone;
+            this.isChecked = isChecked;
+        }
+
+        public void setName(String name){
+            this.name = name;
+        }
+
+        public String getName(){
+            return name;
+        }
+
+        public void setPhone(String phone){
+            this.phone = phone;
+        }
+
+        public String getPhone(){
+            return phone;
+        }
+
+        public void setIsChecked(boolean isChecked){
+            this.isChecked = isChecked;
+        }
+
+        public boolean getIsChecked(){
+            return isChecked;
+        }
+
+        public void toggle(){
+            this.isChecked = !isChecked;
+        }
+
     }
 }
