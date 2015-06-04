@@ -25,11 +25,17 @@ import android.view.MotionEvent;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import trooperdesigns.com.lastminute.NewEventFragment;
+import trooperdesigns.com.lastminute.ViewContactsActivity;
+
 public class IndexableListView extends ListView {
-	
+
+	//static boolean isKeyboardOpen = false;
 	private boolean mIsFastScrollEnabled = false;
 	private IndexScroller mScroller = new IndexScroller(getContext(), this);
 	private GestureDetector mGestureDetector = null;
+	Canvas canvas;
+
 
 	public IndexableListView(Context context) {
 		super(context);
@@ -57,9 +63,10 @@ public class IndexableListView extends ListView {
 	@Override
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
+		this.canvas = canvas;
 		
 		// Overlay index bar
-		if (mScroller != null)
+		if (mScroller != null && !ViewContactsActivity.isKeyboardOpen)
 			mScroller.draw(canvas);
 	}
 
@@ -113,6 +120,14 @@ public class IndexableListView extends ListView {
 		super.onSizeChanged(w, h, oldw, oldh);
 		if (mScroller != null)
 			mScroller.onSizeChanged(w, h, oldw, oldh);
+	}
+
+	public Canvas getCanvas(){
+		return canvas;
+	}
+
+	public IndexScroller getScroller(){
+		return mScroller;
 	}
 
 }

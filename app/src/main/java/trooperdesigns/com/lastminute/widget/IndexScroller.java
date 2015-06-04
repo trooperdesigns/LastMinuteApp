@@ -29,6 +29,8 @@ import android.widget.Adapter;
 import android.widget.ListView;
 import android.widget.SectionIndexer;
 
+import trooperdesigns.com.lastminute.ViewContactsActivity;
+
 public class IndexScroller {
 	
 	private float mIndexbarWidth;
@@ -164,14 +166,14 @@ public class IndexScroller {
 	}
 	
 	public void show() {
-		if (mState == STATE_HIDDEN)
+		if (mState == STATE_HIDDEN || ViewContactsActivity.isKeyboardOpen == false)
 			setState(STATE_SHOWING);
-		else if (mState == STATE_HIDING)
+		else if (mState == STATE_HIDING || ViewContactsActivity.isKeyboardOpen == true)
 			setState(STATE_HIDING);
 	}
 	
 	public void hide() {
-		if (mState == STATE_SHOWN)
+		if (mState == STATE_SHOWN || ViewContactsActivity.isKeyboardOpen == true)
 			setState(STATE_HIDING);
 	}
 	
@@ -182,7 +184,7 @@ public class IndexScroller {
 		}
 	}
 	
-	private void setState(int state) {
+	public void setState(int state) {
 		if (state < STATE_HIDDEN || state > STATE_HIDING)
 			return;
 		

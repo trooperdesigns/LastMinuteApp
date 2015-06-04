@@ -1,5 +1,6 @@
 package trooperdesigns.com.lastminute;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -11,7 +12,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FunctionCallback;
@@ -35,6 +39,8 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 	private Button viewAllContactsButton;
 	private Button createButton;
+	private Button doneButton;
+	private ListView inviteesList;
 
 	// variables used for parse
 	ParseUser currentUser;
@@ -43,13 +49,13 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 	ParseObject event;
 	ParseUser foundUser;
 	ArrayList<String> list;
-	static List<Contact> selectedContacts = new ArrayList<>();
-	// used to sync up already selected contacts
-	static ArrayList<String> selectedContactsNumbers = new ArrayList<>();
-	// TODO: once event fully created, reset selectedContactsNumbers
+	// TODO: empty allContacts list when event is created
+	static List<Contact> allContacts = new ArrayList<>();
+	List<Contact> selectedContacts = new ArrayList<>();
 	ArrayList<Parcelable> returnParcel = new ArrayList<>();
 	StringBuilder sb = new StringBuilder();
 
+	InviteesAdapter invAdapter;
 
 	public NewEventFragment() {
 	}
@@ -91,7 +97,6 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 			@Override
 			public void onClick(View v) {
-
 
 				event = new ParseObject("Event");
 				event.put("title", "Android Test");
@@ -138,6 +143,21 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 			}
 		});
 
+		doneButton = (Button) rootView.findViewById(R.id.done_button);
+		doneButton.setOnClickListener(new View.OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				MainActivity.mViewPager.setCurrentItem(0);
+				resetNewEventFragment();
+			}
+		});
+
+		inviteesList = (ListView) rootView.findViewById(R.id.invitees_list);
+		invAdapter = new InviteesAdapter(getActivity().getApplicationContext(), selectedContacts);
+		inviteesList.setAdapter(invAdapter);
+
+
 		return rootView;
 	}
 
@@ -162,6 +182,19 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 	}
 
+	public void resetNewEventFragment(){
+		// create new NewEventFragment
+		NewEventFragment fragment = new NewEventFragment();
+
+		FragmentManager fragmentManager = getFragmentManager();
+		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+		fragmentTransaction.replace(R.id.root_frame, fragment, fragment.toString());
+
+		//fragmentTransaction.setCustomAnimations(R.anim.push_left_in, R.anim.push_left_out);
+		//fragmentTransaction.addToBackStack(fragment.toString());
+		fragmentTransaction.commit();
+	}
+
 	@Override
 	public void onClick(View v) {
 		//openSelectContactsFragment();
@@ -177,11 +210,14 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 			if (resultCode == FragmentActivity.RESULT_OK) {
 				// The user selected contacts
 
-				// print out all contacts in selectedContacts
+				selectedContacts = new ArrayList<>();
+
+				// print out all contacts in allContacts
 				sb = new StringBuilder();
-				for(int i = 0 ; i < selectedContacts.size(); i++){
-					if(selectedContacts.get(i).getIsChecked() == true){
-						sb.append(selectedContacts.get(i).getName() + ",");
+				for(int i = 0 ; i < allContacts.size(); i++){
+					if(allContacts.get(i).getIsChecked() == true){
+						sb.append(allContacts.get(i).getName() + ",");
+						selectedContacts.add(allContacts.get(i));
 					}
 
 				}
@@ -189,7 +225,51 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 				Toast.makeText(getActivity(), sb.toString(), Toast.LENGTH_SHORT).show();
 
 				// TODO: refresh list of invited contacts
+				//invAdapter.notifyDataSetChanged();
+
 			}
+		}
+	}
+
+	public class InviteesAdapter extends BaseAdapter {
+
+		private LayoutInflater mInflater;
+
+		InviteesAdapter (Context context, List<Contact> contacts){
+
+			mInflater = LayoutInflater.from(context);
+			mInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+		}
+
+		@Override
+		public int getCount() {
+			return selectedContacts.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return selectedContacts.get(position).getName();
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+
+			View vi = convertView;
+			if (convertView == null) vi = mInflater.inflate(R.layout.invitees_row, null);
+			Log.d("invitees", convertView + " : " + vi);
+			Log.d("invitees", getItem(position).toString());
+			TextView nameText = (TextView) vi.findViewById(R.id.contact_name);
+			nameText.setText(getItem(position).toString());
+
+
+
+			return vi;
 		}
 	}
 

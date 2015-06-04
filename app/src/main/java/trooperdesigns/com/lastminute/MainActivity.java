@@ -52,7 +52,7 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    ViewPager mViewPager;
+    static ViewPager mViewPager;
 
     private TextView message;
     private PagerTitleStrip titleStrip;

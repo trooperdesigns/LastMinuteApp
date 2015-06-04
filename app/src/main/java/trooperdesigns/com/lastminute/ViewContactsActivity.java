@@ -5,11 +5,13 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -43,6 +45,8 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
 
     private Button select;
     private EditText search;
+    IndexableListView lv;
+    public static boolean isKeyboardOpen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,14 +56,22 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
         //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_view_contacts);
 
+        isKeyboardOpen = false;
+        originalContacts = NewEventFragment.allContacts;
+
         search = (EditText) findViewById(R.id.search);
 
-        contactsResult = new ArrayList<>();
+        search.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                isKeyboardOpen = true;
+                return false;
+            }
+        });
 
         search.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
@@ -69,13 +81,12 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
 
             @Override
             public void afterTextChanged(Editable s) {
-
             }
         });
 
         getAllContacts(this.getContentResolver());
-        IndexableListView lv = (IndexableListView) findViewById(R.id.lv);
-        contactsAdapter = new ContactsAdapter(getApplicationContext(), NewEventFragment.selectedContacts);
+        lv  = (IndexableListView) findViewById(R.id.lv);
+        contactsAdapter = new ContactsAdapter(getApplicationContext(), NewEventFragment.allContacts);
         lv.setClickable(true);
         lv.setAdapter(contactsAdapter);
         lv.setOnItemClickListener(this);
@@ -90,8 +101,8 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
             public void onClick(View v) {
                 Boolean noneSelected = true;
                 // check all contacts if any are selected
-                for(int i = 0; i < NewEventFragment.selectedContacts.size(); i++){
-                    if(NewEventFragment.selectedContacts.get(i).getIsChecked() == true){
+                for(int i = 0; i < NewEventFragment.allContacts.size(); i++){
+                    if(NewEventFragment.allContacts.get(i).getIsChecked() == true){
                         noneSelected = false;
                     }
                 }
@@ -125,9 +136,10 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
         } else if (imm.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0) == false && !search.getText().toString().matches("")) {
             search.setText(null);
         } else {
+            NewEventFragment.allContacts = originalContacts;
             super.onBackPressed();
         }
-
+        isKeyboardOpen = false;
         return;
     }
 
@@ -138,13 +150,24 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
 
     public void getAllContacts(ContentResolver cr) {
 
-        if(NewEventFragment.selectedContacts.isEmpty()){
+        String prevName = "";
+
+        if(NewEventFragment.allContacts.isEmpty()){
             Cursor phones = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
             // initialize Contact object for each contact in phonebook
             while (phones.moveToNext()) {
                 String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                 String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                NewEventFragment.selectedContacts.add(new Contact(name, phoneNumber, false));
+                if(name.equalsIgnoreCase(prevName)){
+                    NewEventFragment.allContacts.add(new Contact(name + " (" +
+                            getType(phones.getInt(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE))) + ")",
+                            phoneNumber, false));
+                } else {
+                    NewEventFragment.allContacts.add(new Contact(name,
+                            phoneNumber, false));
+                }
+                prevName = name;
+
             }
 
             phones.close();
@@ -158,14 +181,17 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
     class ContactsAdapter extends BaseAdapter implements CompoundButton.OnCheckedChangeListener, SectionIndexer, Filterable {
         CheckBox cb;
         private String mSections = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Canvas canvas;
 
         private LayoutInflater mInflater;
         private ItemFilter mFilter = new ItemFilter();
 
+        View vi;
+
         ContactsAdapter(Context context, List<Contact> contacts) {
 
             // set originalContacts and filteredContacts as original Contacts list
-            NewEventFragment.selectedContacts = contacts;
+            NewEventFragment.allContacts = contacts;
             filteredContacts = contacts;
 
             mInflater = LayoutInflater.from(context);
@@ -190,7 +216,7 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
-            View vi = convertView;
+            vi = convertView;
             if (convertView == null) vi = mInflater.inflate(R.layout.all_contacts_row, null);
 
             TextView tv = (TextView) vi.findViewById(R.id.contact_name);
@@ -248,7 +274,6 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
 
         }
 
-
         @Override
         public int getPositionForSection(int section) {
             // If there is no item for current section, previous section will be selected
@@ -295,7 +320,7 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
                 FilterResults results = new FilterResults();
 
                 // remember original list
-                final List<Contact> origList = NewEventFragment.selectedContacts;
+                final List<Contact> origList = NewEventFragment.allContacts;
                 int count = origList.size();
 
                 // create new list that will be used as filteredList
@@ -325,6 +350,35 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
                 notifyDataSetChanged();
             }
 
+        }
+
+        public View getView(){
+            return vi;
+        }
+    }
+
+    public String getType(int value){
+        switch(value){
+            case(ContactsContract.CommonDataKinds.Phone.TYPE_HOME):
+                return "home";
+            case(ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE):
+                return "cell";
+            case(ContactsContract.CommonDataKinds.Phone.TYPE_WORK):
+                return "work";
+            case(ContactsContract.CommonDataKinds.Phone.TYPE_FAX_WORK):
+                return "work fax";
+            case(ContactsContract.CommonDataKinds.Phone.TYPE_FAX_HOME):
+                return "home fax";
+            case(ContactsContract.CommonDataKinds.Phone.TYPE_PAGER):
+                return "pager";
+            case(ContactsContract.CommonDataKinds.Phone.TYPE_OTHER):
+                return "other";
+            case(ContactsContract.CommonDataKinds.Phone.TYPE_CALLBACK):
+                return "callback";
+            case(ContactsContract.CommonDataKinds.Phone.TYPE_COMPANY_MAIN):
+                return "company main";
+            default:
+                return "";
         }
     }
 }
