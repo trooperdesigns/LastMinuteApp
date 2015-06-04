@@ -53,19 +53,19 @@
 
     <Button android:id="@+id/testButton"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:text="Select Contacts"
         />
 
     <Button android:id="@+id/create_button"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:text="Create"
         />
 
     <Button android:id="@+id/done_button"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:text="Done"
         />
 
