@@ -40,7 +40,7 @@
     <Button android:id="@+id/testButton"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:text="View All Contacts"
+        android:text="Select Contacts"
         />
 
     <Button android:id="@+id/create_button"

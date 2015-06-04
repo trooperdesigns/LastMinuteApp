@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:layout_gravity="center_horizontal|center"
-            android:text="Done" />
+            android:text="Select" />
 
     </LinearLayout>
 

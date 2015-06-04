@@ -2,9 +2,12 @@ package trooperdesigns.com.lastminute;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,20 +19,19 @@ import com.parse.ParseAnonymousUtils;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class NewEventFragment extends Fragment implements View.OnClickListener {
+
+	static final int PICK_CONTACTS_REQUEST = 2;
 
 	private Button viewAllContactsButton;
 	private Button createButton;
@@ -41,6 +43,12 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 	ParseObject event;
 	ParseUser foundUser;
 	ArrayList<String> list;
+	static List<Contact> selectedContacts = new ArrayList<>();
+	// used to sync up already selected contacts
+	static ArrayList<String> selectedContactsNumbers = new ArrayList<>();
+	// TODO: once event fully created, reset selectedContactsNumbers
+	ArrayList<Parcelable> returnParcel = new ArrayList<>();
+	StringBuilder sb = new StringBuilder();
 
 
 	public NewEventFragment() {
@@ -139,10 +147,10 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 	}
 
 	// replace current fragment (event details) with new fragment (All contacts fragment)
-	public void openAllContactsFragment()
+	public void openSelectContactsFragment()
 	{
 		// create new AllContacts Fragment
-		AllContactsFragment fragment = new AllContactsFragment();
+		SelectContactsFragment fragment = new SelectContactsFragment();
 
 		FragmentManager fragmentManager = getFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -156,9 +164,33 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		//openAllContactsFragment();
+		//openSelectContactsFragment();
 		Intent intent = new Intent(getActivity(), ViewContactsActivity.class);
-		startActivity(intent);
+		startActivityForResult(intent, PICK_CONTACTS_REQUEST);
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// Check which request we're responding to
+		if (requestCode == PICK_CONTACTS_REQUEST) {
+			// Make sure the request was successful
+			if (resultCode == FragmentActivity.RESULT_OK) {
+				// The user selected contacts
+
+				// print out all contacts in selectedContacts
+				sb = new StringBuilder();
+				for(int i = 0 ; i < selectedContacts.size(); i++){
+					if(selectedContacts.get(i).getIsChecked() == true){
+						sb.append(selectedContacts.get(i).getName() + ",");
+					}
+
+				}
+				Log.d("recreate", "after: " + sb.toString());
+				Toast.makeText(getActivity(), sb.toString(), Toast.LENGTH_SHORT).show();
+
+				// TODO: refresh list of invited contacts
+			}
+		}
 	}
 
 

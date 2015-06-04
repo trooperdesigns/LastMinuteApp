@@ -17,9 +17,11 @@ import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -64,6 +66,7 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
     private ImageView slideIcon;
     private LinearLayout sliderHelper;
     private Button viewAllContactsButton;
+    private EditText search;
 
     private EventsFragment eventsFragment;
     private NewEventFragment newEventFragment;
@@ -125,10 +128,11 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
         sliderHelper = (LinearLayout) findViewById(R.id.slider_helper);
 
         settingsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-        settingsPanel.setAnchorPoint(0.5f);
+        settingsPanel.setAnchorPoint(0.75f);
 
         slideIcon = (ImageView) findViewById(R.id.settings_icon);
 
+        search = (EditText) findViewById(R.id.search);
 
         settingsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
@@ -259,6 +263,19 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
             if(mViewPager.getCurrentItem() == 1){
                 // TODO: if viewing all contacts to invite in event creation page (fragment), can't go back to creation page
                 //mViewPager.setCurrentItem(0);
+                // if sliding panel is open, close it
+                /*
+                InputMethodManager imm = (InputMethodManager) this
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                if(imm.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0) == true){
+                    super.onBackPressed();
+                } else if(imm.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0) == false && !search.getText().toString().matches("")){
+                    search.setText(null);
+                } else {
+                    super.onBackPressed();
+                }
+                */
                 super.onBackPressed();
             } else {
                 // otherwise do as it normally would (finish())
@@ -266,6 +283,8 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
             }
 
         }
+
+
 
         return;
     }
