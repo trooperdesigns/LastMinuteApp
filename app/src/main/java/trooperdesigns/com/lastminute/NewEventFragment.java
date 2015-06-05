@@ -1,7 +1,11 @@
 package trooperdesigns.com.lastminute;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
@@ -148,8 +152,13 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 			@Override
 			public void onClick(View v) {
-				MainActivity.mViewPager.setCurrentItem(0);
-				resetNewEventFragment();
+
+				MainActivity.mViewPager.setCurrentItem(0); // switch to events (home) page
+				resetNewEventFragment(); // recreate NewEventFragment
+				// set all contacts to unchecked
+				for(int i = 0; i < allContacts.size(); i++){
+					allContacts.get(i).setIsChecked(false);
+				}
 			}
 		});
 
@@ -159,11 +168,6 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 
 		return rootView;
-	}
-
-	public static NewEventFragment newInstance(FragmentListener fragmentListener) {
-		NewEventFragment f = new NewEventFragment();
-		return f;
 	}
 
 	// replace current fragment (event details) with new fragment (All contacts fragment)
@@ -219,7 +223,6 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 						sb.append(allContacts.get(i).getName() + ",");
 						selectedContacts.add(allContacts.get(i));
 					}
-
 				}
 				Log.d("recreate", "after: " + sb.toString());
 				Toast.makeText(getActivity(), sb.toString(), Toast.LENGTH_SHORT).show();
@@ -262,16 +265,10 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 			View vi = convertView;
 			if (convertView == null) vi = mInflater.inflate(R.layout.invitees_row, null);
-			Log.d("invitees", convertView + " : " + vi);
-			Log.d("invitees", getItem(position).toString());
 			TextView nameText = (TextView) vi.findViewById(R.id.contact_name);
 			nameText.setText(getItem(position).toString());
-
-
 
 			return vi;
 		}
 	}
-
-
 }
