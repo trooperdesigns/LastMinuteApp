@@ -23,11 +23,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FunctionCallback;
+import com.parse.ParseACL;
 import com.parse.ParseAnonymousUtils;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseRelation;
+import com.parse.ParseRole;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -102,47 +105,36 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 			@Override
 			public void onClick(View v) {
 
-				event = new ParseObject("Event");
-				event.put("title", "Android Test");
-				event.put("details", "2232 Langham");
-				event.put("status", 0);
-				Calendar c = Calendar.getInstance();
-				Date date = c.getTime();
-				event.put("startTime", date);
-				event.put("endTime", date);
-				event.put("minAttendees", 1);
-				event.put("creator", currentUser);
+			// TODO: Move event creation to parse code & pass in event parameters only
+			event = new ParseObject("Event");
+			event.put("title", "Android Test");
+			event.put("details", "2232 Langham");
+			event.put("status", 0);
+			Calendar c = Calendar.getInstance();
+			Date date = c.getTime();
+			event.put("startTime", date);
+			event.put("endTime", date);
+			event.put("minAttendees", 1);
+			event.put("creator", currentUser);
 
-				list = new ArrayList<>();
-				list.add("justin");
-				list.add("justin2");
+			list = new ArrayList<>();
+			list.add("justin");
+			list.add("justin2");
 
-				event.saveInBackground(new SaveCallback() {
-					@Override
-					public void done(ParseException e) {
-						if (e == null) {
-							// success
+			HashMap<String, Object> newEvent = new HashMap<>();
+			//newEvent.put("event", event.getObjectId());
+			newEvent.put("invitees", list);
 
-							HashMap<String, Object> newEvent = new HashMap<>();
-							newEvent.put("event", event.getObjectId());
-							newEvent.put("invitees", list);
-
-							ParseCloud.callFunctionInBackground("sendInvitations", newEvent, new FunctionCallback<String>() {
-								public void done(String response, ParseException e) {
-									if (e == null) {
-										// success
-										Toast.makeText(getActivity(), "Success: " + response, Toast.LENGTH_SHORT).show();
-									} else {
-										Toast.makeText(getActivity(), "Error: " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-									}
-								}
-							});
-
-						} else {
-							Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-						}
+			ParseCloud.callFunctionInBackground("createEvent", newEvent, new FunctionCallback<String>() {
+				public void done(String response, ParseException e) {
+					if (e == null) {
+						// success
+						Toast.makeText(getActivity(), "Success: " + response, Toast.LENGTH_SHORT).show();
+					} else {
+						Toast.makeText(getActivity(), "Error: " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
 					}
-				});
+				}
+			});
 
 			}
 		});
@@ -152,6 +144,29 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 			@Override
 			public void onClick(View v) {
+
+				Intent intent = new Intent(getActivity(), MainActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				PendingIntent pIntent = PendingIntent.getActivity(getActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+				// Build notification
+				Notification noti = new Notification.Builder(getActivity())
+						.setContentTitle("Last Minute App")
+						.setContentText("You have been invited to ______").setSmallIcon(R.drawable.twitter_icon_small)
+						.setContentIntent(pIntent)
+						.addAction(R.drawable.twitter_icon_small, "Call", pIntent)
+						.addAction(R.drawable.twitter_icon_small, "More", pIntent)
+						.addAction(R.drawable.twitter_icon_small, "And more", pIntent)
+						//Vibration
+						.setVibrate(new long[]{0, 300, 300, 300})
+						//LED
+						.setLights(1001, 1000, 1000).build();
+
+				NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(getActivity().NOTIFICATION_SERVICE);
+				// hide the notification after its selected
+				noti.flags |= Notification.FLAG_AUTO_CANCEL;
+
+				notificationManager.notify(0, noti);
 
 				MainActivity.mViewPager.setCurrentItem(0); // switch to events (home) page
 				resetNewEventFragment(); // recreate NewEventFragment

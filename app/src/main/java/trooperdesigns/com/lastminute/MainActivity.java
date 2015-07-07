@@ -104,6 +104,9 @@ public class MainActivity extends FragmentActivity implements FragmentChangeList
             if (currentUser != null) {
                 // let logged in users stay
                 this.currentUser = currentUser;
+                ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+                installation.put("userId", currentUser.getObjectId());
+                installation.saveInBackground();
             } else {
                 // send user to login page if currentUser doesn't exist
                 Intent i = new Intent(MainActivity.this, LoginActivity.class);

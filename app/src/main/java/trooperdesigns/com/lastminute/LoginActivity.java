@@ -63,9 +63,9 @@ public class LoginActivity extends Activity {
 
 		// If you would like all objects to be private by default, remove this
 		// line.
-		defaultACL.setPublicReadAccess(false);
+		//defaultACL.setPublicReadAccess(false);
 
-		ParseACL.setDefaultACL(defaultACL, true);
+		//ParseACL.setDefaultACL(defaultACL, true);
 
 		// determine if current user is anonymous
 		if (ParseAnonymousUtils.isLinked(ParseUser.getCurrentUser())) {
@@ -99,7 +99,7 @@ public class LoginActivity extends Activity {
 				password = passwordInput.getText().toString().toLowerCase(l);
 
 				// TODO Auto-generated method stub
-				ParseUser.logInInBackground(username, password, new LogInCallback() {
+				ParseUser.logInInBackground(username, password,  new LogInCallback() {
 
 					@Override
 					public void done(ParseUser user, ParseException e) {

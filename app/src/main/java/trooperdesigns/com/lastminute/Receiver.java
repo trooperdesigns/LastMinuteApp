@@ -6,14 +6,19 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.parse.ParsePushBroadcastReceiver;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Receiver extends ParsePushBroadcastReceiver {
 
-    Context context;
+    String title, message;
 
     public Receiver() {
         super();
@@ -24,22 +29,35 @@ public class Receiver extends ParsePushBroadcastReceiver {
         Log.d("receive", "received");
         //super.onReceive(context, intent);
 
+        String jsonData = intent.getStringExtra("com.parse.Data");
+
+        try {
+            JSONObject notification = new JSONObject(jsonData);
+            //title = notification.getString("title");
+            message = notification.getString("alert");
+
+        } catch (JSONException e){
+            Toast.makeText(context, "Something went wrong with the notification: " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        Log.d("receive", "message: " + message);
+
         Intent i = new Intent(context, MainActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pIntent = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Build notification
         Notification noti = new Notification.Builder(context)
-                .setContentTitle("___ has invited you to an event!")
-                .setContentText("Subject").setSmallIcon(R.drawable.twitter_icon)
+                .setContentTitle("Last Minute App")
+                .setContentText(message).setSmallIcon(R.drawable.twitter_icon_small)
                 .setContentIntent(pIntent)
-                .addAction(R.drawable.twitter_icon, "Call", pIntent)
-                .addAction(R.drawable.twitter_icon, "More", pIntent)
-                .addAction(R.drawable.twitter_icon, "And more", pIntent)
+                .addAction(R.drawable.twitter_icon_small, "Call", pIntent)
+                .addAction(R.drawable.twitter_icon_small, "More", pIntent)
+                .addAction(R.drawable.twitter_icon_small, "And more", pIntent)
                 //Vibration
                 .setVibrate(new long[]{0, 300, 300, 300})
                 //LED
-                .setLights(Color.RED, 3000, 3000).build();
+                .setLights(1001, 1000, 1000).build();
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
         // hide the notification after its selected

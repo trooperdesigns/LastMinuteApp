@@ -5,7 +5,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -124,7 +123,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 	}
 
 	// replace current fragment (event details) with new fragment (All contacts fragment)
-	public void openAllContactsFragment()
+	public void openAllParticipantsFragment()
 	{
 		// create new AllContacts Fragment
 		AllContactsFragment fragment = new AllContactsFragment();
@@ -139,6 +138,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 
 	@Override
 	public void onClick(View v) {
-		openAllContactsFragment();
+		openAllParticipantsFragment();
 	}
 }

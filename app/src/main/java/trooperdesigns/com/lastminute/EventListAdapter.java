@@ -32,7 +32,7 @@ public class EventListAdapter extends ParseQueryAdapter implements Filterable {
 			public ParseQuery<ParseObject> create() {
 				ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Event");
 				// First try to find from the cache and only then go to network
-				query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE); // or CACHE_ONLY
+				//query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE); // or CACHE_ONLY
 				//query.whereEqualTo("highPri", true);
 				return query;
 			}
