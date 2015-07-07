@@ -14,7 +14,7 @@
         android:gravity="center" />
 
     <EditText
-        android:id="@+id/editText1"
+        android:id="@+id/create_eventName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10" 
@@ -24,14 +24,14 @@
     </EditText>
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/create_EventLocation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="Event Location" />
 
     <EditText
-        android:id="@+id/editText3"
+        android:id="@+id/create_eventTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10" 

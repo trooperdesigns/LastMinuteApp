@@ -20,6 +20,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.parse.FunctionCallback;
@@ -48,6 +49,7 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 	private Button createButton;
 	private Button doneButton;
 	private ListView inviteesList;
+    private EditText eventName;
 
 	// variables used for parse
 	ParseUser currentUser;
@@ -64,12 +66,16 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 	InviteesAdapter invAdapter;
 
+    public boolean isEmpty(EditText text) {
+        return text.getText().toString().trim().length() == 0;
+    }
+
 	public NewEventFragment() {
 	}
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
-		View rootView = inflater.inflate(R.layout.fragment_new_event, container, false);
+		final View rootView = inflater.inflate(R.layout.fragment_new_event, container, false);
 
 		// don't need this, just keep for now (
 		// determine if current user is anonymous
@@ -98,7 +104,7 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 		viewAllContactsButton = (Button) rootView.findViewById(R.id.testButton);
 		viewAllContactsButton.setOnClickListener(this);
-
+        eventName = (EditText) rootView.findViewById(R.id.create_eventName);
 		createButton = (Button) rootView.findViewById(R.id.create_button);
 		createButton.setOnClickListener(new View.OnClickListener(){
 
@@ -117,14 +123,20 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 			event.put("minAttendees", 1);
 			event.put("creator", currentUser);
 
+            if (isEmpty(eventName)) {
+                Toast.makeText(getActivity(), "plz enter event title ", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
 			list = new ArrayList<>();
 			list.add("justin");
 			list.add("justin2");
+//
 
 			HashMap<String, Object> newEvent = new HashMap<>();
 			//newEvent.put("event", event.getObjectId());
 			newEvent.put("invitees", list);
-
+            newEvent.put("title", eventName.getText().toString());
 			ParseCloud.callFunctionInBackground("createEvent", newEvent, new FunctionCallback<String>() {
 				public void done(String response, ParseException e) {
 					if (e == null) {
