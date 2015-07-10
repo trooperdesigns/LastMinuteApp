@@ -17,25 +17,52 @@
         android:id="@+id/create_eventName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#00000000"
         android:ems="10" 
         android:hint="Event Name">
 
         <requestFocus />
     </EditText>
+    <View
+        android:id="@+id/separator"
+        android:background="#ffffff"
+        android:layout_width = "fill_parent"
+        android:layout_height="1dip"
+        android:layout_marginBottom="2dip"
+        android:layout_centerVertical ="true"
+        android:layout_alignParentTop="true"/>
+
+    <EditText
+        android:id="@+id/create_eventDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00000000"
+        android:ems="10"
+        android:hint="Details"/>
 
     <EditText
         android:id="@+id/create_EventLocation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#00000000"
         android:ems="10"
-        android:hint="Event Location" />
+        android:hint="Location" />
+
+    <View
+        android:id="@+id/separator2"
+        android:background="#ffffff"
+        android:layout_width = "fill_parent"
+        android:layout_height="1dip"
+        android:layout_centerVertical ="true"
+        android:layout_alignParentTop="true"/>
 
     <EditText
         android:id="@+id/create_eventTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#00000000"
         android:ems="10" 
-        android:hint="Event Time"/>
+        android:hint="Date &amp; Time"/>
 
     <TextView
         android:layout_width="fill_parent"

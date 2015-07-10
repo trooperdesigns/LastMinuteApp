@@ -134,7 +134,7 @@ public class EventsFragment extends ListFragment {
 		// do something
 		//Toast.makeText(getActivity(), object.getString("title"), Toast.LENGTH_SHORT).show();
 	}
-	
+
 	
 	
 	public void setNumEvents(){

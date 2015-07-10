@@ -30,7 +30,7 @@ public class AllContactsListAdapter extends ParseQueryAdapter implements Filtera
         // Todos marked as high-pri
         super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
             public ParseQuery<ParseObject> create() {
-                ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Todo");
+                ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Invitation");
                 //query.whereContains("title", "asdf");
                 // First try to find from the cache and only then go to network
                 query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE); // or CACHE_ONLY
@@ -61,7 +61,7 @@ public class AllContactsListAdapter extends ParseQueryAdapter implements Filtera
         // Add the title view
         TextView titleTextView = (TextView) v.findViewById(R.id.eventTitle);
         titleTextView.setFocusable(false);
-        titleTextView.setText(object.getString("title").toUpperCase());
+        titleTextView.setText(object.getParseUser("user").getUsername());
 
         /*
 

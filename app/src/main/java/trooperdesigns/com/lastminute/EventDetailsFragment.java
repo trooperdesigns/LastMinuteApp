@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseImageView;
@@ -29,6 +30,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 	private TextView textView;
 	private ParseImageView imageView;
 	private FrameLayout container;
+	private ParseObject currEvent;
 
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -54,18 +56,19 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 		viewContactsButton.setOnClickListener(this);
 
 
-
 		ParseQuery<ParseObject> query = ParseQuery.getQuery("Event");
 		query.whereEqualTo("objectId", objectId);
 		// First try to find from the cache and only then go to network
 		query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE); // or CACHE_ONLY
 		// Execute the query to find the object with ID
-		query.findInBackground(new FindCallback<ParseObject>() {
+		query.getFirstInBackground(new GetCallback<ParseObject>() {
 			@Override
-			public void done(List<ParseObject> list, ParseException e) {
+			public void done(ParseObject event, ParseException e) {
 				if (e == null) {
-					ParseObject object = list.get(0);
-					ParseFile imageFile = object.getParseFile("image");
+					currEvent = event;
+					EventDetailsActivity.event = event;
+
+					ParseFile imageFile = event.getParseFile("image");
 					if (imageFile != null) {
 						imageView.setParseFile(imageFile);
 						imageView.loadInBackground();
@@ -74,16 +77,16 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 					// Add the title view
 					TextView titleTextView = (TextView) rootView.findViewById(R.id.eventTitle);
 					titleTextView.setFocusable(false);
-					titleTextView.setText(object.getString("title").toUpperCase());
+					titleTextView.setText(event.getString("title").toUpperCase());
 
 					// TextView for Location (using details for dummy)
 					TextView locationTextView = (TextView) rootView.findViewById(R.id.eventLocation);
 					locationTextView.setFocusable(false);
-					locationTextView.setText(object.getString("details").toUpperCase());
+					locationTextView.setText(event.getString("details").toUpperCase());
 
 					// get Date object and use for formatting
-					Date startDate = object.getDate("startTime");
-					Date endDate = object.getDate("endTime");
+					Date startDate = event.getDate("startTime");
+					Date endDate = event.getDate("endTime");
 
 					SimpleDateFormat dateFormat;
 
@@ -101,8 +104,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 					TextView timeTextView = (TextView) rootView.findViewById(R.id.eventTime);
 					timeTextView.setFocusable(false);
 					timeTextView.setText(dateFormat.format(startDate) + " - " + dateFormat.format(endDate));
-				}
-				else {
+				} else {
 					textView.setText(e.getLocalizedMessage());
 				}
 			}
@@ -127,6 +129,9 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 	{
 		// create new AllContacts Fragment
 		AllContactsFragment fragment = new AllContactsFragment();
+		Bundle bundle = new Bundle();
+		bundle.putString("eventId", currEvent.getObjectId());
+		fragment.setArguments(bundle);
 
 		FragmentManager fragmentManager = getFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

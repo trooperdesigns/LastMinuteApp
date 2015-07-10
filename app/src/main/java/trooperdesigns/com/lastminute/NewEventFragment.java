@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
@@ -24,16 +23,12 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.parse.FunctionCallback;
-import com.parse.ParseACL;
 import com.parse.ParseAnonymousUtils;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseRelation;
-import com.parse.ParseRole;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -130,9 +125,7 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 			list = new ArrayList<>();
 			list.add("justin");
-			list.add("justin2");
-//
-
+			//list.add("justin2");
 			HashMap<String, Object> newEvent = new HashMap<>();
 			//newEvent.put("event", event.getObjectId());
 			newEvent.put("invitees", list);
@@ -232,6 +225,8 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 		Intent intent = new Intent(getActivity(), ViewContactsActivity.class);
 		startActivityForResult(intent, PICK_CONTACTS_REQUEST);
 	}
+
+
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {

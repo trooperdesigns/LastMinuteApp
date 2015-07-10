@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.parse.ParseImageView;
+import com.parse.ParseObject;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.text.DateFormatSymbols;
@@ -39,6 +40,7 @@ public class EventDetailsActivity extends FragmentActivity implements FragmentCh
     private LinearLayout sliderHelper;
     private ImageView slideIcon;
     private Toolbar toolbar;
+    public static ParseObject event;
 
     private GridView gridView;
     private Integer[] mThumbIds = {
@@ -171,7 +173,13 @@ public class EventDetailsActivity extends FragmentActivity implements FragmentCh
 
     }
 
+    public void setEvent(ParseObject event) {
+        this.event = event;
+    }
 
+    public ParseObject getEvent() {
+        return event;
+    }
 
     String getMonthName(int num) {
         String month = "wrong";
