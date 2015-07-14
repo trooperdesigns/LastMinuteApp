@@ -13,9 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Created by JustinChang on 15-07-07.
- */
+
 public class AllContactsAdapter extends BaseAdapter {
 
     private LayoutInflater mInflater;

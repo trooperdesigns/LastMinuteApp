@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import com.parse.ParseFile;
 import com.parse.ParseImageView;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -26,16 +28,19 @@ import java.util.Date;
 import java.util.List;
 
 public class EventDetailsFragment extends Fragment implements View.OnClickListener {
-	private Button logoutButton;
+	private Button viewContactsButton;
 	private TextView textView;
 	private ParseImageView imageView;
 	private FrameLayout container;
-	private ParseObject currEvent;
+	private ParseObject event;
+	private AllContactsFragment allContactsFragment;
+	private static AllContactsAdapter allContactsAdapter;
 
-	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
 		final View rootView = inflater.inflate(R.layout.fragment_event_details, container, false);
+
+		this.event = EventListAdapter.event;
 
 		imageView = (ParseImageView) rootView.findViewById(R.id.icon);
 
@@ -52,63 +57,72 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 		toast.show();
 
 		// View Contacts button to open new All Contacts Fragment
-		Button viewContactsButton = (Button) rootView.findViewById(R.id.testButton);
+		viewContactsButton = (Button) rootView.findViewById(R.id.testButton);
 		viewContactsButton.setOnClickListener(this);
+		viewContactsButton.setVisibility(View.GONE);
 
 
-		ParseQuery<ParseObject> query = ParseQuery.getQuery("Event");
-		query.whereEqualTo("objectId", objectId);
-		// First try to find from the cache and only then go to network
-		query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE); // or CACHE_ONLY
-		// Execute the query to find the object with ID
-		query.getFirstInBackground(new GetCallback<ParseObject>() {
+		EventDetailsActivity.event = event;
+
+		ParseRelation<ParseObject> relation = event.getRelation("invitees");
+		ParseQuery<ParseObject> relationQuery = relation.getQuery();
+		relationQuery.include("user");
+		relationQuery.findInBackground(new FindCallback<ParseObject>() {
 			@Override
-			public void done(ParseObject event, ParseException e) {
+			public void done(List<ParseObject> invitations, ParseException e) {
 				if (e == null) {
-					currEvent = event;
-					EventDetailsActivity.event = event;
-
-					ParseFile imageFile = event.getParseFile("image");
-					if (imageFile != null) {
-						imageView.setParseFile(imageFile);
-						imageView.loadInBackground();
+					Log.d("invitation", String.valueOf(invitations.size()));
+					for (ParseObject object : invitations) {
+						Log.d("invitation", object.getParseUser("user").getObjectId());
 					}
+					allContactsFragment = new AllContactsFragment();
+					allContactsAdapter = new AllContactsAdapter(getActivity(), invitations);
+					//allContactsFragment.setListAdapter(allContactsAdapter);
+					viewContactsButton.setVisibility(View.VISIBLE);
 
-					// Add the title view
-					TextView titleTextView = (TextView) rootView.findViewById(R.id.eventTitle);
-					titleTextView.setFocusable(false);
-					titleTextView.setText(event.getString("title").toUpperCase());
-
-					// TextView for Location (using details for dummy)
-					TextView locationTextView = (TextView) rootView.findViewById(R.id.eventLocation);
-					locationTextView.setFocusable(false);
-					locationTextView.setText(event.getString("details").toUpperCase());
-
-					// get Date object and use for formatting
-					Date startDate = event.getDate("startTime");
-					Date endDate = event.getDate("endTime");
-
-					SimpleDateFormat dateFormat;
-
-					dateFormat = new SimpleDateFormat("MM");
-					String month = getMonthName(Integer.parseInt(dateFormat.format(startDate))).toUpperCase();
-
-					// textView for Date
-					dateFormat = new SimpleDateFormat(" dd yyyy");
-					TextView dateTextView = (TextView) rootView.findViewById(R.id.eventDate);
-					dateTextView.setFocusable(false);
-					dateTextView.setText(month + dateFormat.format(startDate));
-
-					// textView for start time
-					dateFormat = new SimpleDateFormat("hh:mma");
-					TextView timeTextView = (TextView) rootView.findViewById(R.id.eventTime);
-					timeTextView.setFocusable(false);
-					timeTextView.setText(dateFormat.format(startDate) + " - " + dateFormat.format(endDate));
 				} else {
-					textView.setText(e.getLocalizedMessage());
+					Log.d("invitation", e.getLocalizedMessage());
 				}
+
 			}
 		});
+
+		ParseFile imageFile = event.getParseFile("image");
+		if (imageFile != null) {
+			imageView.setParseFile(imageFile);
+			imageView.loadInBackground();
+		}
+
+		// Add the title view
+		TextView titleTextView = (TextView) rootView.findViewById(R.id.eventTitle);
+		titleTextView.setFocusable(false);
+		titleTextView.setText(event.getString("title").toUpperCase());
+
+		// TextView for Location (using details for dummy)
+		TextView locationTextView = (TextView) rootView.findViewById(R.id.eventLocation);
+		locationTextView.setFocusable(false);
+		locationTextView.setText(event.getString("details").toUpperCase());
+
+		// get Date object and use for formatting
+		Date startDate = event.getDate("startTime");
+		Date endDate = event.getDate("endTime");
+
+		SimpleDateFormat dateFormat;
+
+		dateFormat = new SimpleDateFormat("MM");
+		String month = getMonthName(Integer.parseInt(dateFormat.format(startDate))).toUpperCase();
+
+		// textView for Date
+		dateFormat = new SimpleDateFormat(" dd yyyy");
+		TextView dateTextView = (TextView) rootView.findViewById(R.id.eventDate);
+		dateTextView.setFocusable(false);
+		dateTextView.setText(month + dateFormat.format(startDate));
+
+		// textView for start time
+		dateFormat = new SimpleDateFormat("hh:mma");
+		TextView timeTextView = (TextView) rootView.findViewById(R.id.eventTime);
+		timeTextView.setFocusable(false);
+		timeTextView.setText(dateFormat.format(startDate) + " - " + dateFormat.format(endDate));
 		
 		return rootView;
 	}
@@ -127,16 +141,11 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 	// replace current fragment (event details) with new fragment (All contacts fragment)
 	public void openAllParticipantsFragment()
 	{
-		// create new AllContacts Fragment
-		AllContactsFragment fragment = new AllContactsFragment();
-		Bundle bundle = new Bundle();
-		bundle.putString("eventId", currEvent.getObjectId());
-		fragment.setArguments(bundle);
 
 		FragmentManager fragmentManager = getFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-		fragmentTransaction.replace(this.getId(), fragment, fragment.toString());
-		fragmentTransaction.addToBackStack(fragment.toString());
+		fragmentTransaction.replace(this.getId(), allContactsFragment, allContactsFragment.toString());
+		fragmentTransaction.addToBackStack(allContactsFragment.toString());
 		fragmentTransaction.commit();
 
 	}
@@ -144,5 +153,9 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 	@Override
 	public void onClick(View v) {
 		openAllParticipantsFragment();
+	}
+
+	public static AllContactsAdapter getAllContactsAdapter() {
+		return allContactsAdapter;
 	}
 }

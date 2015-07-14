@@ -48,10 +48,12 @@ public class AllContactsFragment extends ListFragment {
         View rootView = inflater.inflate(R.layout.fragment_all_contacts, container,
                 false);
 
+        /*
         Bundle args = getArguments();
         if(args != null && args.containsKey("eventId")){
             eventId = args.getString("eventId");
         }
+        */
 
         listView = (ListView) rootView.findViewById(android.R.id.list);
 
@@ -65,77 +67,17 @@ public class AllContactsFragment extends ListFragment {
             }
         });
 
-        /*
-        // setting custom adapter for listFragment
-        allContactsListAdapter = new AllContactsListAdapter(getActivity());
-        listView.setAdapter(allContactsListAdapter);
+        listView.setAdapter(EventDetailsFragment.getAllContactsAdapter());
 
-        // initial load of events list contents
-        load();
-        allContactsListAdapter.loadObjects();
-        */
-
-        ParseQuery eventQuery = ParseQuery.getQuery("Event");
-        eventQuery.whereEqualTo("objectId", eventId);
-        Log.d("invitation", eventId);
-        ParseRelation<ParseObject> relation = EventDetailsActivity.event.getRelation("invitees");
-        ParseQuery<ParseObject> relationQuery = relation.getQuery();
-        relationQuery.include("user");
-        relationQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> invitations, ParseException e) {
-                if (e == null) {
-                    Log.d("invitation", String.valueOf(invitations.size()));
-                    for (ParseObject object : invitations) {
-                        Log.d("invitation", object.getParseUser("user").getObjectId());
-                    }
-                    allContactsAdapter = new AllContactsAdapter(getActivity(), invitations);
-                    listView.setAdapter(allContactsAdapter);
-                    load();
-                } else {
-                    Log.d("invitation", e.getLocalizedMessage());
-                }
-
-            }
-        });
-
-        /*
-        eventQuery.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject event, ParseException e) {
-                if(e == null) {
-                    ParseRelation<ParseObject> relation = event.getRelation("invitees");
-                    ParseQuery<ParseObject> relationQuery = relation.getQuery();
-                    relationQuery.include("user");
-                    relationQuery.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> invitations, ParseException e) {
-                            if (e == null) {
-                                Log.d("invitation", String.valueOf(invitations.size()));
-                                for (ParseObject object : invitations) {
-                                    Log.d("invitation", object.getParseUser("user").getObjectId());
-                                }
-                                allContactsAdapter = new AllContactsAdapter(getActivity(), invitations);
-                                listView.setAdapter(allContactsAdapter);
-                                load();
-                            } else {
-                                Log.d("invitation", e.getLocalizedMessage());
-                            }
-
-                        }
-                    });
-
-
-                } else {
-                    Log.d("invitation", "Error querying event: "+ e.getLocalizedMessage());
-                }
-            }
-        });
-        */
         //setNumEvents();
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         return rootView;
+    }
+
+    public void setListAdapter(AllContactsAdapter adapter) {
+        listView.setAdapter(allContactsAdapter);
+        load();
     }
 
     private void load(){

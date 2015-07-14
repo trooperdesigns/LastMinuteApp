@@ -23,6 +23,8 @@ import java.util.Date;
 
 public class EventListAdapter extends ParseQueryAdapter implements Filterable {
 
+	public static ParseObject event;
+
 	@SuppressWarnings("unchecked")
 	public EventListAdapter(Context context) {
 		
@@ -41,17 +43,19 @@ public class EventListAdapter extends ParseQueryAdapter implements Filterable {
 
 	// Customize the layout by overriding getItemView
 	@Override
-	public View getItemView(ParseObject object, View v, ViewGroup parent) {
+	public View getItemView(ParseObject event, View v, ViewGroup parent) {
 		if (v == null) {
 			v = View.inflate(getContext(), R.layout.row, null);
 		}
 
-		super.getItemView(object, v, parent);
+		super.getItemView(event, v, parent);
+
+		this.event = event;
 
 		// Add and download the image
 		ParseImageView eventImage = (ParseImageView) v.findViewById(R.id.icon);
 		eventImage.setFocusable(false);
-		ParseFile imageFile = object.getParseFile("image");
+		ParseFile imageFile = event.getParseFile("image");
 		if (imageFile != null) {
 			eventImage.setParseFile(imageFile);
 			eventImage.loadInBackground();
@@ -60,18 +64,18 @@ public class EventListAdapter extends ParseQueryAdapter implements Filterable {
 		// Add the title view
 		TextView titleTextView = (TextView) v.findViewById(R.id.eventTitle);
 		titleTextView.setFocusable(false);
-		titleTextView.setText(object.getString("title").toUpperCase());
+		titleTextView.setText(event.getString("title").toUpperCase());
 
 		// TextView for Location (using details for dummy)
 		TextView locationTextView = (TextView) v.findViewById(R.id.eventLocation);
 		locationTextView.setFocusable(false);
-		locationTextView.setText(object.getString("details").toUpperCase());
+		locationTextView.setText(event.getString("details").toUpperCase());
 
 		// TODO: Check that dates exist, otherwise parsing error
 
 		// get Date object and use for formatting
-		Date startDate = object.getDate("startTime");
-		Date endDate = object.getDate("endTime");
+		Date startDate = event.getDate("startTime");
+		Date endDate = event.getDate("endTime");
 
 		SimpleDateFormat dateFormat;
 
