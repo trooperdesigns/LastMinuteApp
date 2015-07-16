@@ -49,6 +49,7 @@ public class EventsFragment extends ListFragment {
 			public void onRefresh() {
 				load();
 				eventsAdapter.loadObjects();
+
 				swipeLayout.setRefreshing(false);
 			}
 		});
@@ -147,5 +148,4 @@ public class EventsFragment extends ListFragment {
 		MainActivity containerActivity = (MainActivity) getActivity();
 		//containerActivity.update();
 	}
-	
 }

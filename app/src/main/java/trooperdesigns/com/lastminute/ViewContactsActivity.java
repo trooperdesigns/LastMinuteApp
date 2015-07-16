@@ -220,11 +220,13 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
             if (convertView == null) vi = mInflater.inflate(R.layout.all_contacts_row, null);
 
             TextView tv = (TextView) vi.findViewById(R.id.contact_name);
+            TextView tv1 = (TextView) vi.findViewById(R.id.contact_number);
             cb = (CheckBox) vi.findViewById(R.id.contact_is_checked);
             tv.setText("Name: " + filteredContacts.get(position).getName());
 
             // TODO: Uncomment next line when using phone number as username to query
-            //tv1.setText("Phone No:" + phone.get(position));
+            tv1.setText("Phone No: " + filteredContacts.get(position).getPhone());
+//            tv1.setText("Phone No:" + phone.get(position));
             cb.setTag(position);
             cb.setChecked(filteredContacts.get(position).getIsChecked());
             cb.setOnCheckedChangeListener(this);
@@ -244,6 +246,7 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
                 holder = new ViewHolder();
                 holder.name = (TextView) convertView.findViewById(R.id.contact_name);
                 holder.checked = (CheckBox) convertView.findViewById(R.id.contact_is_checked);
+                holder.phone = (TextView) convertView.findViewById(R.id.contact_number);
                 //holder.phone = (TextView) convertView.findViewById(R.id.textView2);
 
                 // Bind the data efficiently with the holder.
@@ -256,6 +259,7 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
 
             // If weren't re-ordering this you could rely on what you set last time
             holder.name.setText(filteredContacts.get(position).getName());
+            holder.phone.setText(filteredContacts.get(position).getPhone());
             holder.checked.setChecked(filteredContacts.get(position).getIsChecked());
 
             return convertView;
@@ -263,6 +267,7 @@ public class ViewContactsActivity extends Activity implements AdapterView.OnItem
 
         public class ViewHolder {
             TextView name;
+            TextView phone;
             CheckBox checked;
         }
 

@@ -119,7 +119,7 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 			event.put("creator", currentUser);
 
             if (isEmpty(eventName)) {
-                Toast.makeText(getActivity(), "plz enter event title ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Please enter an event title ", Toast.LENGTH_SHORT).show();
                 return;
             }
 
