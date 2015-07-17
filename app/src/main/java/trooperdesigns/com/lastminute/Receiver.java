@@ -1,3 +1,6 @@
+/**
+ * For receiving push notifications
+ */
 package trooperdesigns.com.lastminute;
 
 import android.app.Notification;

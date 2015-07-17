@@ -39,17 +39,11 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 	static final int PICK_CONTACTS_REQUEST = 2;
 
-	private Button viewAllContactsButton;
-	private Button createButton;
-	private Button doneButton;
+	private Button viewAllContactsButton, createButton, doneButton;
 	private ListView inviteesList;
 
 	// variables used for parse
 	ParseUser currentUser;
-	ParseRelation<ParseObject> invitees;
-	ParseObject invitation;
-	ParseObject event;
-	ParseUser foundUser;
 	ArrayList<String> list;
 	// TODO: empty allContacts list when event is created
 	static List<Contact> allContacts = new ArrayList<>();
@@ -88,7 +82,6 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 				getActivity().finish();
 			}
-
 		}
 
 		viewAllContactsButton = (Button) rootView.findViewById(R.id.testButton);
@@ -100,24 +93,11 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 			@Override
 			public void onClick(View v) {
 
-			// TODO: Move event creation to parse code & pass in event parameters only
-			event = new ParseObject("Event");
-			event.put("title", "Android Test");
-			event.put("details", "2232 Langham");
-			event.put("status", 0);
-			Calendar c = Calendar.getInstance();
-			Date date = c.getTime();
-			event.put("startTime", date);
-			event.put("endTime", date);
-			event.put("minAttendees", 1);
-			event.put("creator", currentUser);
-
 			list = new ArrayList<>();
 			list.add("justin");
-			//list.add("justin2");
+			list.add("justin2");
 
 			HashMap<String, Object> newEvent = new HashMap<>();
-			//newEvent.put("event", event.getObjectId());
 			newEvent.put("invitees", list);
 
 			ParseCloud.callFunctionInBackground("createEvent", newEvent, new FunctionCallback<String>() {

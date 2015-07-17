@@ -22,7 +22,6 @@ public class Contact implements Parcelable {
         this.name = parcel.readString();
         this.phone = parcel.readString();
 
-        //Log.d("recreate", name + ":" + phone);
     }
 
     public void setName(String name){

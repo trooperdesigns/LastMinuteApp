@@ -1,6 +1,8 @@
 package trooperdesigns.com.lastminute;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,12 +47,36 @@ public class AllContactsAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View v, ViewGroup parent) {
-        if (v == null) v = mInflater.inflate(R.layout.contacts_row, null);
+        if (v == null) v = mInflater.inflate(R.layout.invitees_row, null);
 
-        TextView tv = (TextView) v.findViewById(R.id.eventTitle);
-        tv.setText("Name: " + invitations.get(position).getParseUser("user").getUsername());
+        ParseObject invitation = invitations.get(position);
+
+        TextView tv = (TextView) v.findViewById(R.id.contact_name);
+        tv.setText("Name: " + invitation.getParseUser("user").getUsername());
+
+        View status = (View) v.findViewById(R.id.contact_status);
+        GradientDrawable statusColour = (GradientDrawable) status.getBackground();
+        switch(invitation.getNumber("status").intValue()) {
+            case 0:
+                statusColour.setColor(Color.GRAY);
+                break;
+            case 1:
+                statusColour.setColor(Color.GREEN);
+                break;
+            case 2:
+                statusColour.setColor(Color.RED);
+                break;
+            default:
+                statusColour.setColor(Color.GRAY);
+                break;
+        }
 
         return v;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        return false;
     }
 
     // use to sort invitees list alphabetically

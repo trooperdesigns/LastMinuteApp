@@ -14,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseImageView;
@@ -41,6 +40,8 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 		final View rootView = inflater.inflate(R.layout.fragment_event_details, container, false);
 
 		this.event = EventListAdapter.event;
+
+
 
 		imageView = (ParseImageView) rootView.findViewById(R.id.icon);
 
