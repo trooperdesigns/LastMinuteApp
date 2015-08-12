@@ -39,7 +39,7 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 	static final int PICK_CONTACTS_REQUEST = 2;
 
-	private Button viewAllContactsButton, createButton, doneButton;
+	private Button viewAllContactsButton, createButton, createButton2, doneButton;
 	private ListView inviteesList;
 
 	// variables used for parse
@@ -87,30 +87,26 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 		viewAllContactsButton = (Button) rootView.findViewById(R.id.testButton);
 		viewAllContactsButton.setOnClickListener(this);
 
+		// TODO: REMOVE, currently for testing (invite only 1 person)
 		createButton = (Button) rootView.findViewById(R.id.create_button);
 		createButton.setOnClickListener(new View.OnClickListener(){
-
 			@Override
 			public void onClick(View v) {
+				list = new ArrayList<>();
+				list.add("justin");
+				createEvent(list);
+			}
+		});
 
-			list = new ArrayList<>();
-			list.add("justin");
-			list.add("justin2");
-
-			HashMap<String, Object> newEvent = new HashMap<>();
-			newEvent.put("invitees", list);
-
-			ParseCloud.callFunctionInBackground("createEvent", newEvent, new FunctionCallback<String>() {
-				public void done(String response, ParseException e) {
-					if (e == null) {
-						// success
-						Toast.makeText(getActivity(), "Success: " + response, Toast.LENGTH_SHORT).show();
-					} else {
-						Toast.makeText(getActivity(), "Error: " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-					}
-				}
-			});
-
+		// TODO: REMOVE, currently for testing (invite 2 people)
+		createButton2 = (Button) rootView.findViewById(R.id.create_button_2);
+		createButton2.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				list = new ArrayList<>();
+				list.add("justin");
+				list.add("justin2");
+				createEvent(list);
 			}
 		});
 
@@ -158,6 +154,22 @@ public class NewEventFragment extends Fragment implements View.OnClickListener {
 
 
 		return rootView;
+	}
+
+	public void createEvent(List<String> list) {
+		HashMap<String, Object> newEvent = new HashMap<>();
+		newEvent.put("invitees", list);
+
+		ParseCloud.callFunctionInBackground("createEvent", newEvent, new FunctionCallback<String>() {
+			public void done(String response, ParseException e) {
+				if (e == null) {
+					// success
+					Toast.makeText(getActivity(), "Success: " + response, Toast.LENGTH_SHORT).show();
+				} else {
+					Toast.makeText(getActivity(), "Error: " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
 	}
 
 	// replace current fragment (event details) with new fragment (All contacts fragment)

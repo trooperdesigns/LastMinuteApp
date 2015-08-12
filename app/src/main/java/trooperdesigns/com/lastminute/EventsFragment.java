@@ -26,8 +26,9 @@ public class EventsFragment extends ListFragment {
 	 */
 	public static final String ARG_SECTION_NUMBER = "section_number";
 	public static int numEvents;
+	public static boolean clearCache = false;
 
-	private EventListAdapter eventsAdapter;
+	public static EventListAdapter eventsAdapter;
 	private ListView listView;
 	private SwipeRefreshLayout swipeLayout;
 
@@ -104,21 +105,14 @@ public class EventsFragment extends ListFragment {
 		
 		final android.support.v4.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
 
-		String tag = EventDetailsFragment.class.getName();
-		//Fragment fragment = getFragmentManager().findFragmentByTag(tag);
-/*		if (fragment == null) {
-		   fragment = new EventDetailsFragment();
-		   ft.replace(R.id.pager, new EventDetailsFragment(), "NewFragmentTag"); 
-		}
-		*/
 		Intent i = new Intent(getActivity(), EventDetailsActivity.class);
-
 
 		// put all event information necessary for full event page in bundle
 		Bundle bundle = new Bundle();
 		bundle.putString("objectId", object.getObjectId()); // objectId of event
 		bundle.putString("title", object.getString("title")); // title of event
 		bundle.putString("createdAt", object.getCreatedAt().toString()); // createdAt
+		bundle.putString("details", object.getString("details")); // details of event
 
 		ParseFile pf = object.getParseFile("image");
 		if(pf != null){
@@ -134,8 +128,6 @@ public class EventsFragment extends ListFragment {
 		// do something
 		//Toast.makeText(getActivity(), object.getString("title"), Toast.LENGTH_SHORT).show();
 	}
-
-	
 	
 	public void setNumEvents(){
 		numEvents = listView.getCount();

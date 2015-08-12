@@ -47,7 +47,7 @@ public class AllContactsFragment extends ListFragment {
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                allContactsAdapter.notifyDataSetChanged();
+                EventDetailsFragment.getAllContactsAdapter().notifyDataSetChanged();
                 swipeLayout.setRefreshing(false);
             }
         });
