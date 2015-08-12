@@ -110,7 +110,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 							//allContactsFragment.setListAdapter(allContactsAdapter);
 							viewContactsButton.setVisibility(View.VISIBLE);
 
-
 							ParseFile imageFile = event.getParseFile("image");
 							if (imageFile != null) {
 								imageView.setParseFile(imageFile);
@@ -151,7 +150,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 						} else {
 							Log.d("invitation", e.getLocalizedMessage());
 						}
-
 					}
 				});
 			}
@@ -161,9 +159,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 
 			}
 		});
-
 		return rootView;
-
 	}
 
 	private void replyInvitation(String invitationResponse) {
